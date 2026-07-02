@@ -1,0 +1,243 @@
+@import "tailwindcss";
+
+/* Tokens — :root is dark (the default); [data-theme="light"] overrides.
+   Mirrors the approved CatchIt mockup so the built site matches it exactly. */
+:root {
+  --color-bg: #0f100c;
+  --color-surface: #1b1c15;
+  --color-surface-2: #26271e;
+  --color-ink: #edece2;
+  --color-ink-2: #c6c4b4;
+  --color-ink-3: #9c9a8a;
+  --color-ink-4: #807e6d;
+  --color-ink-5: #6a6858;
+  --color-border: #2c2d23;
+  --color-border-soft: #252620;
+  --color-header-bg: rgba(15, 16, 12, 0.82);
+  --color-pill-bg: #26271e;
+  --color-logo-bg: #26271e;
+  --color-panel: #1e1f17;
+  --color-focus: #c7f04a;
+  --color-ok: #79d3a0;
+  --color-ok-bg: rgba(47, 158, 95, 0.16);
+  --color-danger: #e0492a;
+  --color-danger-bg: rgba(224, 73, 42, 0.18);
+  --color-danger-ink: #f09a85;
+
+  /* accent stays lime in both themes */
+  --color-accent: #c7f04a;
+  --color-accent-hover: #b6e23a;
+  --color-accent-ink: #14140e;
+
+  /* category badge colors: dot / dark-mode bg / dark-mode fg (light-mode
+     variants are declared in the [data-theme="light"] block below) */
+  --color-cat-hackathon-dot: #7c5cff;
+  --color-cat-hackathon-bg: rgba(124, 92, 255, 0.16);
+  --color-cat-hackathon-fg: #b7a6ff;
+
+  --color-cat-voucher-dot: #2f9e5f;
+  --color-cat-voucher-bg: rgba(47, 158, 95, 0.16);
+  --color-cat-voucher-fg: #79d3a0;
+
+  --color-cat-event-dot: #e08a2b;
+  --color-cat-event-bg: rgba(224, 138, 43, 0.17);
+  --color-cat-event-fg: #f0b36b;
+
+  --color-cat-scholarship-dot: #3b82d6;
+  --color-cat-scholarship-bg: rgba(59, 130, 214, 0.17);
+  --color-cat-scholarship-fg: #82b4f0;
+
+  --color-cat-internship-dot: #d45c8e;
+  --color-cat-internship-bg: rgba(212, 92, 142, 0.17);
+  --color-cat-internship-fg: #ee9bc0;
+
+  --color-cat-conference-dot: #16a8a0;
+  --color-cat-conference-bg: rgba(22, 168, 160, 0.17);
+  --color-cat-conference-fg: #71d6ce;
+
+  --color-cat-journal-dot: #c9a227;
+  --color-cat-journal-bg: rgba(201, 162, 39, 0.18);
+  --color-cat-journal-fg: #e3c86a;
+
+  --color-cat-other-dot: #8a8a7e;
+  --color-cat-other-bg: rgba(138, 138, 126, 0.2);
+  --color-cat-other-fg: #b8b7a9;
+}
+
+[data-theme="light"] {
+  --color-bg: #ecebe4;
+  --color-surface: #ffffff;
+  --color-surface-2: #f2f0e8;
+  --color-ink: #14140e;
+  --color-ink-2: #57543f;
+  --color-ink-3: #6b6a5d;
+  --color-ink-4: #918e7f;
+  --color-ink-5: #a9a697;
+  --color-border: #e7e3d6;
+  --color-border-soft: #eae6d9;
+  --color-header-bg: rgba(236, 235, 228, 0.82);
+  --color-pill-bg: #14140e;
+  --color-logo-bg: #20201b;
+  --color-panel: #20201b;
+  --color-focus: #14140e;
+  --color-ok: #1f7a48;
+  --color-ok-bg: #e4f3ea;
+  --color-danger: #b23a1e;
+  --color-danger-bg: #fce3db;
+  --color-danger-ink: #b23a1e;
+
+  --color-cat-hackathon-bg: #eee9ff;
+  --color-cat-hackathon-fg: #5b3fc4;
+  --color-cat-voucher-bg: #e2f3e9;
+  --color-cat-voucher-fg: #1f7a48;
+  --color-cat-event-bg: #fbebd9;
+  --color-cat-event-fg: #a85d0c;
+  --color-cat-scholarship-bg: #e3edfb;
+  --color-cat-scholarship-fg: #1e5aab;
+  --color-cat-internship-bg: #fbe4ee;
+  --color-cat-internship-fg: #a83566;
+  --color-cat-conference-bg: #ddf2f0;
+  --color-cat-conference-fg: #0e6b65;
+  --color-cat-journal-bg: #f7f0d8;
+  --color-cat-journal-fg: #8a6d0b;
+  --color-cat-other-bg: #eaeae3;
+  --color-cat-other-fg: #55554c;
+}
+
+/* Tailwind v4 CSS-first theme: maps the tokens above to bg-, text-, and
+   border- utilities (e.g. bg-surface, text-ink-3, border-border, font-display). */
+@theme inline {
+  --color-bg: var(--color-bg);
+  --color-surface: var(--color-surface);
+  --color-surface-2: var(--color-surface-2);
+  --color-ink: var(--color-ink);
+  --color-ink-2: var(--color-ink-2);
+  --color-ink-3: var(--color-ink-3);
+  --color-ink-4: var(--color-ink-4);
+  --color-ink-5: var(--color-ink-5);
+  --color-border: var(--color-border);
+  --color-border-soft: var(--color-border-soft);
+  --color-header-bg: var(--color-header-bg);
+  --color-pill-bg: var(--color-pill-bg);
+  --color-logo-bg: var(--color-logo-bg);
+  --color-panel: var(--color-panel);
+  --color-focus: var(--color-focus);
+  --color-ok: var(--color-ok);
+  --color-ok-bg: var(--color-ok-bg);
+  --color-danger: var(--color-danger);
+  --color-danger-bg: var(--color-danger-bg);
+  --color-danger-ink: var(--color-danger-ink);
+  --color-accent: var(--color-accent);
+  --color-accent-hover: var(--color-accent-hover);
+  --color-accent-ink: var(--color-accent-ink);
+
+  --color-cat-hackathon-dot: var(--color-cat-hackathon-dot);
+  --color-cat-hackathon-bg: var(--color-cat-hackathon-bg);
+  --color-cat-hackathon-fg: var(--color-cat-hackathon-fg);
+  --color-cat-voucher-dot: var(--color-cat-voucher-dot);
+  --color-cat-voucher-bg: var(--color-cat-voucher-bg);
+  --color-cat-voucher-fg: var(--color-cat-voucher-fg);
+  --color-cat-event-dot: var(--color-cat-event-dot);
+  --color-cat-event-bg: var(--color-cat-event-bg);
+  --color-cat-event-fg: var(--color-cat-event-fg);
+  --color-cat-scholarship-dot: var(--color-cat-scholarship-dot);
+  --color-cat-scholarship-bg: var(--color-cat-scholarship-bg);
+  --color-cat-scholarship-fg: var(--color-cat-scholarship-fg);
+  --color-cat-internship-dot: var(--color-cat-internship-dot);
+  --color-cat-internship-bg: var(--color-cat-internship-bg);
+  --color-cat-internship-fg: var(--color-cat-internship-fg);
+  --color-cat-conference-dot: var(--color-cat-conference-dot);
+  --color-cat-conference-bg: var(--color-cat-conference-bg);
+  --color-cat-conference-fg: var(--color-cat-conference-fg);
+  --color-cat-journal-dot: var(--color-cat-journal-dot);
+  --color-cat-journal-bg: var(--color-cat-journal-bg);
+  --color-cat-journal-fg: var(--color-cat-journal-fg);
+  --color-cat-other-dot: var(--color-cat-other-dot);
+  --color-cat-other-bg: var(--color-cat-other-bg);
+  --color-cat-other-fg: var(--color-cat-other-fg);
+
+  --font-display: var(--font-space-grotesk);
+  --font-sans: var(--font-instrument-sans);
+}
+
+@keyframes opp-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(0.6);
+  }
+}
+
+@keyframes opp-sweep {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-opp-pulse {
+  animation: opp-pulse 1.5s ease-in-out infinite;
+}
+
+.animate-opp-sweep {
+  animation: opp-sweep 3.2s linear infinite;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+input,
+textarea,
+select,
+button {
+  font-family: inherit;
+}
+
+input,
+textarea,
+select {
+  color: var(--color-ink);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+}
+
+::placeholder {
+  color: var(--color-ink-5);
+}
+
+/* Theme toggle icon swap — CSS-driven so it never needs client JS state or
+   an effect to sync with the data-theme attribute the no-flash script sets. */
+.theme-icon-light {
+  display: none;
+}
+[data-theme="light"] .theme-icon-dark {
+  display: none;
+}
+[data-theme="light"] .theme-icon-light {
+  display: inline;
+}
