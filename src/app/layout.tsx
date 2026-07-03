@@ -41,6 +41,8 @@ const themeInitScript = `
 })();
 `;
 
+const umamiWebsiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -54,6 +56,9 @@ export default function RootLayout({
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+        {umamiWebsiteId && (
+          <script defer src="https://cloud.umami.is/script.js" data-website-id={umamiWebsiteId} />
+        )}
       </head>
       <body className="min-h-full flex flex-col bg-bg font-sans text-ink" suppressHydrationWarning>
         <Header />
