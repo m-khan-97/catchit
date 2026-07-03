@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/discover",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/check-links",
+      "schedule": "0 7 * * 1"
     }
   ]
 }

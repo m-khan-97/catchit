@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { ReviewQueue } from "./review-queue";
+import { BrokenLinks } from "./broken-links";
 import { signOut } from "./actions";
 
 export const metadata: Metadata = { title: "Review queue" };
@@ -43,6 +44,15 @@ export default async function AdminPage() {
 
   if (error) throw error;
 
+  const { data: brokenLinks, error: brokenLinksError } = await supabase
+    .from("opportunities")
+    .select("*")
+    .eq("status", "approved")
+    .eq("link_status", "broken")
+    .order("last_checked_at", { ascending: false });
+
+  if (brokenLinksError) throw brokenLinksError;
+
   const pendingCount = queue?.length ?? 0;
 
   return (
@@ -65,6 +75,7 @@ export default async function AdminPage() {
         </form>
       </div>
       <ReviewQueue queue={queue ?? []} />
+      <BrokenLinks items={brokenLinks ?? []} />
     </section>
   );
 }

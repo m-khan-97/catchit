@@ -1,37 +1,12 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { mapWithConcurrency } from "@/lib/concurrency";
 import { fetchDevpostCandidates } from "./devpost";
 import { fetchWikiCfpCandidates } from "./wikicfp";
 import { searchForCandidates, type SearchResult } from "./ai-search";
 import { QUERY_POOLS, pickQueriesForToday } from "./queries";
 import { dedupCandidates } from "./dedup";
 import { candidateSchema, type Candidate } from "./schema";
-
-/**
- * Runs `fn` over `items` with at most `limit` in flight at once. AI-search
- * queries hit the Anthropic API with web_search enabled, which can take
- * 10-20+ seconds each — running all ~23 of them sequentially risks
- * exceeding Vercel's function time budget, so we fan out with a cap
- * instead of hammering the API fully unbounded.
- */
-async function mapWithConcurrency<T, R>(
-  items: T[],
-  limit: number,
-  fn: (item: T) => Promise<R>
-): Promise<R[]> {
-  const results: R[] = new Array(items.length);
-  let nextIndex = 0;
-
-  async function worker() {
-    while (nextIndex < items.length) {
-      const current = nextIndex++;
-      results[current] = await fn(items[current]);
-    }
-  }
-
-  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, () => worker()));
-  return results;
-}
 
 interface SourceCount {
   found: number;

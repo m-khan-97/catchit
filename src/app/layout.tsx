@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Instrument_Sans } from "next/font/google";
 import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -57,6 +58,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-bg font-sans text-ink" suppressHydrationWarning>
         <Header />
         <main className="mx-auto w-full max-w-[820px] flex-1 px-5 py-8">{children}</main>
+        <Footer />
       </body>
     </html>
   );
