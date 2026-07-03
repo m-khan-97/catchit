@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { CATEGORIES, AUDIENCE_TAGS } from "@/lib/supabase/types";
-import { sendApprovalNotification } from "@/lib/discord";
+import { sendApprovalNotification, sendBulkApprovalNotifications } from "@/lib/discord";
 
 function parseOpportunityForm(formData: FormData) {
   const category = String(formData.get("category"));
@@ -66,6 +66,36 @@ export async function rejectOpportunity(id: string) {
     .from("opportunities")
     .update({ status: "rejected", reviewed_at: new Date().toISOString() })
     .eq("id", id);
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin");
+}
+
+export async function bulkApprove(ids: string[]) {
+  if (ids.length === 0) return;
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("opportunities")
+    .update({ status: "approved", reviewed_at: new Date().toISOString() })
+    .in("id", ids)
+    .select();
+
+  if (error) throw new Error(error.message);
+
+  await sendBulkApprovalNotifications(data ?? []);
+
+  revalidatePath("/admin");
+}
+
+export async function bulkReject(ids: string[]) {
+  if (ids.length === 0) return;
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("opportunities")
+    .update({ status: "rejected", reviewed_at: new Date().toISOString() })
+    .in("id", ids);
 
   if (error) throw new Error(error.message);
   revalidatePath("/admin");
