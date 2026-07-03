@@ -1,15 +1,20 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { submitOpportunity, type SubmitState } from "./actions";
 import { CATEGORIES, CATEGORY_LABELS, AUDIENCE_TAGS, AUDIENCE_LABELS } from "@/lib/supabase/types";
 import { CATEGORY_STYLES } from "@/lib/opportunities/styles";
+import { trackEvent } from "@/lib/analytics";
 
 const initialState: SubmitState = { status: "idle" };
 
 export function SubmitForm() {
   const [state, formAction, pending] = useActionState(submitOpportunity, initialState);
   const [category, setCategory] = useState<(typeof CATEGORIES)[number]>("hackathon");
+
+  useEffect(() => {
+    if (state.status === "success") trackEvent("submit_opportunity");
+  }, [state.status]);
 
   if (state.status === "success") {
     return (

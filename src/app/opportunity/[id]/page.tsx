@@ -96,6 +96,8 @@ export default async function OpportunityPage({ params }: PageProps) {
           href={sel.url}
           target="_blank"
           rel="noopener noreferrer"
+          data-umami-event="apply_click"
+          data-umami-event-category={sel.category}
           className="flex w-full items-center justify-center gap-2 rounded-[14px] bg-accent p-4 font-display text-base font-bold text-accent-ink hover:bg-accent-hover"
         >
           Apply at {hostOf(sel.url)} <span className="text-sm">↗</span>

@@ -56,9 +56,18 @@ export default async function Home({
   return (
     <section>
       <div className="mt-1 mb-6">
-        <div className="mb-4 inline-flex items-center gap-1.5 rounded-full bg-pill-bg px-3.5 py-1.5 text-[12.5px] font-semibold text-accent">
-          <span className="animate-opp-pulse h-1.5 w-1.5 rounded-full bg-accent" />
-          {feed.length} live right now
+        <div className="mb-4 flex flex-wrap items-center gap-2">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-pill-bg px-3.5 py-1.5 text-[12.5px] font-semibold text-accent">
+            <span className="animate-opp-pulse h-1.5 w-1.5 rounded-full bg-accent" />
+            {feed.length} live right now
+          </div>
+          <a
+            href="/calendar.ics"
+            data-umami-event="ics_subscribe"
+            className="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3.5 py-1.5 text-[12.5px] font-semibold text-ink-3 hover:text-ink-2"
+          >
+            📅 Subscribe to calendar
+          </a>
         </div>
         <h1 className="mb-[11px] font-display text-[41px] leading-[1.01] font-bold tracking-[-0.038em] text-ink">
           Catch it{" "}

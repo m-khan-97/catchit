@@ -21,7 +21,7 @@ Built by [Muhammad Ibrahim](https://github.com/m-khan-97), Vishnu Ajith, and Muh
 
 ## Project status
 
-Full build plan: [`catchit-build-plan.md`](catchit-build-plan.md).
+**Live in production**, discovering and serving real opportunities. Full build plan: [`catchit-build-plan.md`](catchit-build-plan.md).
 
 - [x] **Milestone 1** — Scaffold, design system, database schema, Supabase auth plumbing
 - [x] **Milestone 2** — Public site: feed, filters, search, detail pages, calendar export, submission form, stats, about page, SEO
@@ -29,8 +29,10 @@ Full build plan: [`catchit-build-plan.md`](catchit-build-plan.md).
 - [x] **Milestone 4** — Discovery pipeline (Devpost + WikiCFP + AI search + dedup)
 - [x] **Milestone 5** — Discord webhook integration
 - [x] **Milestone 6** — Polish, docs, deploy (public JSON API, dead-link checking, OG images, this README)
+- [x] **Milestone 7** — Weekly email digest (subscribe/confirm/unsubscribe, Resend) + Privacy/Terms pages
+- [x] **Milestone 8** — Bulk approve/reject in the admin review queue
 
-Progress is tracked via [GitHub Milestones](../../milestones).
+Each milestone is tagged and published as a [GitHub Release](../../releases) with its full changelog.
 
 ## Getting started
 
@@ -100,12 +102,14 @@ curl -X GET "http://localhost:3000/api/cron/check-links" \
 ## Deploying to Vercel
 
 1. Push this repo to GitHub (already done if you're reading this from the deployed repo), then **Import Project** on [vercel.com](https://vercel.com/new).
-2. Add every variable from `.env.example` under **Project Settings → Environment Variables** — `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `ANTHROPIC_API_KEY`, `CRON_SECRET`, `DISCORD_WEBHOOK_URL`, and `NEXT_PUBLIC_SITE_URL` (your production domain, no trailing slash).
-3. Deploy. `vercel.json` already defines both cron jobs — Vercel picks them up automatically:
+2. Add every variable from `.env.example` under **Project Settings → Environment Variables** — `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `ANTHROPIC_API_KEY`, `CRON_SECRET`, `DISCORD_WEBHOOK_URL`, and `NEXT_PUBLIC_SITE_URL` (your production domain, no trailing slash). `RESEND_API_KEY`, `DIGEST_FROM_EMAIL`, and `NEXT_PUBLIC_UMAMI_WEBSITE_ID` are optional — each feature degrades gracefully (console-logged emails, no analytics script) when its variable is unset.
+3. Deploy. `vercel.json` already defines all three cron jobs — Vercel picks them up automatically:
    - `/api/cron/discover` — daily at 06:00 UTC
    - `/api/cron/check-links` — weekly, Monday 07:00 UTC
-4. Confirm the cron jobs are registered under **Project Settings → Cron Jobs**, and that the same `CRON_SECRET` value is set in the environment (Vercel Cron sends it automatically as the `Authorization` header on scheduled invocations).
-5. Run the Supabase migration against your production project if you haven't already (see Database setup above) — this is a separate project from any local/dev Supabase instance you were using.
+   - `/api/cron/digest` — weekly, Monday 08:00 UTC
+4. Confirm the cron jobs are registered under **Project Settings → Cron Jobs**, and that the same `CRON_SECRET` value is set in the environment (Vercel Cron sends it automatically as the `Authorization` header on scheduled invocations). Note: the Hobby plan has historically capped cron job count/frequency — verify all three actually show scheduled "next run" times, not just accepted at deploy time.
+5. Run the Supabase migrations against your production project if you haven't already (see Database setup above) — this is a separate project from any local/dev Supabase instance you were using.
+6. Env var changes only take effect on the *next* deployment — redeploy after adding/changing any variable.
 
 ## Non-negotiables
 

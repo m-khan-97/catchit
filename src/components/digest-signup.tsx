@@ -1,12 +1,17 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { subscribeToDigest, type DigestSignupState } from "@/app/digest/actions";
+import { trackEvent } from "@/lib/analytics";
 
 const initialState: DigestSignupState = { status: "idle" };
 
 export function DigestSignup() {
   const [state, formAction, pending] = useActionState(subscribeToDigest, initialState);
+
+  useEffect(() => {
+    if (state.status === "success") trackEvent("digest_signup");
+  }, [state.status]);
 
   if (state.status === "success") {
     return (
