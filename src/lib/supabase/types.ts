@@ -89,6 +89,18 @@ export type AdminUser = {
   created_at: string;
 };
 
+export type Subscriber = {
+  id: string;
+  email: string;
+  categories: string[];
+  regions: string[];
+  audiences: string[];
+  confirm_token: string;
+  unsubscribe_token: string;
+  confirmed_at: string | null;
+  created_at: string;
+};
+
 export interface Database {
   public: {
     Tables: {
@@ -112,6 +124,12 @@ export interface Database {
         Row: AdminUser;
         Insert: Partial<AdminUser> & Pick<AdminUser, "id" | "email" | "display_name">;
         Update: Partial<AdminUser>;
+        Relationships: [];
+      };
+      subscribers: {
+        Row: Subscriber;
+        Insert: Partial<Subscriber> & Pick<Subscriber, "email">;
+        Update: Partial<Subscriber>;
         Relationships: [];
       };
     };

@@ -3,6 +3,7 @@ import { CATEGORIES, CATEGORY_LABELS, AUDIENCE_TAGS, AUDIENCE_LABELS } from "@/l
 import { CATEGORY_STYLES } from "@/lib/opportunities/styles";
 import { FilterChips, type ChipOption } from "@/components/filter-chips";
 import { OpportunityCard } from "@/components/opportunity-card";
+import { DigestSignup } from "@/components/digest-signup";
 
 const REGIONS = ["UK", "Remote", "Global"];
 
@@ -129,6 +130,8 @@ export default async function Home({
           <div className="text-sm">Try a different category or clear your search.</div>
         </div>
       )}
+
+      <DigestSignup />
     </section>
   );
 }
