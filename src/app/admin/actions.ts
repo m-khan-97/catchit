@@ -4,17 +4,20 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { CATEGORIES, AUDIENCE_TAGS } from "@/lib/supabase/types";
+import { sendApprovalNotification } from "@/lib/discord";
 
 export async function approveOpportunity(id: string) {
   const supabase = await createClient();
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("opportunities")
     .update({ status: "approved", reviewed_at: new Date().toISOString() })
-    .eq("id", id);
+    .eq("id", id)
+    .select()
+    .single();
 
   if (error) throw new Error(error.message);
 
-  // TODO(Milestone 5): fire the Discord webhook here once it's built.
+  await sendApprovalNotification(data);
 
   revalidatePath("/admin");
 }
@@ -54,7 +57,7 @@ export async function saveAndApprove(id: string, formData: FormData) {
   const deadlineRaw = String(formData.get("deadline") ?? "").trim();
 
   const supabase = await createClient();
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("opportunities")
     .update({
       title: String(formData.get("title") ?? "").trim(),
@@ -71,11 +74,13 @@ export async function saveAndApprove(id: string, formData: FormData) {
       status: "approved",
       reviewed_at: new Date().toISOString(),
     })
-    .eq("id", id);
+    .eq("id", id)
+    .select()
+    .single();
 
   if (error) throw new Error(error.message);
 
-  // TODO(Milestone 5): fire the Discord webhook here once it's built.
+  await sendApprovalNotification(data);
 
   revalidatePath("/admin");
 }
