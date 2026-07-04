@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { approveOpportunity, rejectOpportunity, saveAndApprove, bulkApprove, bulkReject } from "./actions";
 import { OpportunityEditForm } from "./opportunity-edit-form";
 import { CATEGORY_LABELS, type Opportunity } from "@/lib/supabase/types";
+import type { NearDuplicateMatch } from "@/lib/discovery/near-duplicates";
 
 function metaLine(row: Opportunity): string {
   const category = CATEGORY_LABELS[row.category];
@@ -17,10 +18,12 @@ function QueueRow({
   row,
   checked,
   onToggle,
+  nearDuplicate,
 }: {
   row: Opportunity;
   checked: boolean;
   onToggle: () => void;
+  nearDuplicate?: NearDuplicateMatch;
 }) {
   const [editing, setEditing] = useState(false);
 
@@ -47,6 +50,12 @@ function QueueRow({
       <div className="min-w-0 flex-1">
         <div className="truncate text-[14.5px] font-semibold text-ink">{row.title}</div>
         <div className="mt-0.5 text-xs text-ink-4">{metaLine(row)}</div>
+        {nearDuplicate && (
+          <div className="mt-1.5 truncate rounded-md bg-danger-bg px-2 py-1 text-[11.5px] text-danger-ink">
+            ⚠ {Math.round(nearDuplicate.score * 100)}% similar to {nearDuplicate.matchStatus}: &quot;
+            {nearDuplicate.matchTitle}&quot;
+          </div>
+        )}
       </div>
       <div className="flex gap-1.5">
         <form action={approveOpportunity.bind(null, row.id)}>
@@ -76,7 +85,13 @@ function QueueRow({
   );
 }
 
-export function ReviewQueue({ queue }: { queue: Opportunity[] }) {
+export function ReviewQueue({
+  queue,
+  nearDuplicates = {},
+}: {
+  queue: Opportunity[];
+  nearDuplicates?: Record<string, NearDuplicateMatch>;
+}) {
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [isPending, startTransition] = useTransition();
 
@@ -154,6 +169,7 @@ export function ReviewQueue({ queue }: { queue: Opportunity[] }) {
             row={row}
             checked={selected.has(row.id)}
             onToggle={() => toggleRow(row.id)}
+            nearDuplicate={nearDuplicates[row.id]}
           />
         ))}
       </div>
