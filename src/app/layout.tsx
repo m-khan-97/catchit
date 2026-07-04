@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Space_Grotesk, Instrument_Sans } from "next/font/google";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
+import { createClient } from "@/lib/supabase/server";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -43,11 +44,16 @@ const themeInitScript = `
 
 const umamiWebsiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <html
       lang="en"
@@ -61,7 +67,7 @@ export default function RootLayout({
         )}
       </head>
       <body className="min-h-full flex flex-col bg-bg font-sans text-ink" suppressHydrationWarning>
-        <Header />
+        <Header signedIn={Boolean(user)} />
         <main className="mx-auto w-full max-w-[820px] flex-1 px-5 py-8">{children}</main>
         <Footer />
       </body>

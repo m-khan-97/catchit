@@ -14,7 +14,7 @@ const NAV = [
   { href: "/about", label: "About" },
 ];
 
-export function Header() {
+export function Header({ signedIn }: { signedIn: boolean }) {
   const pathname = usePathname();
 
   return (
@@ -43,6 +43,16 @@ export function Header() {
               </Link>
             );
           })}
+          <Link
+            href={signedIn ? "/account" : "/login"}
+            className={
+              pathname.startsWith("/account") || pathname === "/login"
+                ? "rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-accent-ink"
+                : "rounded-lg px-3 py-1.5 text-sm font-semibold text-ink-4 hover:text-ink-2"
+            }
+          >
+            {signedIn ? "Account" : "Sign in"}
+          </Link>
           <ThemeToggle />
         </nav>
       </div>

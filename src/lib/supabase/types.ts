@@ -111,6 +111,28 @@ export type Subscriber = {
   created_at: string;
 };
 
+export type Profile = {
+  id: string;
+  calendar_token: string;
+  created_at: string;
+};
+
+export type SavedOpportunity = {
+  id: string;
+  user_id: string;
+  opportunity_id: string;
+  created_at: string;
+};
+
+export type FollowedFilter = {
+  id: string;
+  user_id: string;
+  categories: string[];
+  regions: string[];
+  audiences: string[];
+  created_at: string;
+};
+
 export interface Database {
   public: {
     Tables: {
@@ -146,6 +168,24 @@ export interface Database {
         Row: DiscoveryBatch;
         Insert: Partial<DiscoveryBatch> & Pick<DiscoveryBatch, "run_id" | "batch_id" | "task_map">;
         Update: Partial<DiscoveryBatch>;
+        Relationships: [];
+      };
+      profiles: {
+        Row: Profile;
+        Insert: Partial<Profile> & Pick<Profile, "id">;
+        Update: Partial<Profile>;
+        Relationships: [];
+      };
+      saved_opportunities: {
+        Row: SavedOpportunity;
+        Insert: Partial<SavedOpportunity> & Pick<SavedOpportunity, "user_id" | "opportunity_id">;
+        Update: Partial<SavedOpportunity>;
+        Relationships: [];
+      };
+      followed_filters: {
+        Row: FollowedFilter;
+        Insert: Partial<FollowedFilter> & Pick<FollowedFilter, "user_id">;
+        Update: Partial<FollowedFilter>;
         Relationships: [];
       };
     };

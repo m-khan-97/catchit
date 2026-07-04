@@ -2,10 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getOpportunityById } from "@/lib/supabase/queries";
+import { createClient } from "@/lib/supabase/server";
 import { CategoryBadge } from "@/components/category-badge";
 import { UrgencyBadge } from "@/components/urgency-badge";
 import { formatDeadlineFull, hostOf } from "@/lib/opportunities/format";
 import { CATEGORY_LABELS } from "@/lib/supabase/types";
+import { saveOpportunity, unsaveOpportunity } from "@/app/account/actions";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -35,6 +37,22 @@ export default async function OpportunityPage({ params }: PageProps) {
   const sel = await getOpportunityById(id);
   if (!sel) notFound();
 
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  let isSaved = false;
+  if (user) {
+    const { data } = await supabase
+      .from("saved_opportunities")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("opportunity_id", sel.id)
+      .maybeSingle();
+    isSaved = Boolean(data);
+  }
+
   const region = sel.region_tags.join(", ") || "Region unspecified";
 
   return (
@@ -49,6 +67,25 @@ export default async function OpportunityPage({ params }: PageProps) {
       <div className="mb-3.5 flex flex-wrap items-center gap-2">
         <CategoryBadge category={sel.category} />
         <UrgencyBadge deadline={sel.deadline} />
+        <div className="ml-auto">
+          {user ? (
+            <form action={(isSaved ? unsaveOpportunity : saveOpportunity).bind(null, sel.id)}>
+              <button
+                type="submit"
+                className="rounded-lg border border-border bg-surface px-3 py-1.5 text-[13px] font-semibold text-ink-3 hover:text-ink"
+              >
+                {isSaved ? "★ Saved" : "☆ Save"}
+              </button>
+            </form>
+          ) : (
+            <Link
+              href={`/login?next=/opportunity/${sel.id}`}
+              className="rounded-lg border border-border bg-surface px-3 py-1.5 text-[13px] font-semibold text-ink-3 hover:text-ink"
+            >
+              Sign in to save
+            </Link>
+          )}
+        </div>
       </div>
 
       <h1 className="mb-2 font-display text-[29px] leading-[1.14] font-bold tracking-[-0.02em] text-ink">

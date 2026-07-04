@@ -1,9 +1,12 @@
+import Link from "next/link";
 import { getFeed } from "@/lib/supabase/queries";
+import { createClient } from "@/lib/supabase/server";
 import { CATEGORIES, CATEGORY_LABELS, AUDIENCE_TAGS, AUDIENCE_LABELS } from "@/lib/supabase/types";
 import { CATEGORY_STYLES } from "@/lib/opportunities/styles";
 import { FilterChips, type ChipOption } from "@/components/filter-chips";
 import { OpportunityCard } from "@/components/opportunity-card";
 import { DigestSignup } from "@/components/digest-signup";
+import { followFilter } from "@/app/account/actions";
 
 const REGIONS = ["UK", "Remote", "Global"];
 
@@ -25,6 +28,11 @@ export default async function Home({
   const q = first(sp.q);
 
   const feed = await getFeed({ category, region, audience, q });
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   const currentParams = new URLSearchParams();
   if (category !== "all") currentParams.set("category", category);
@@ -124,6 +132,29 @@ export default async function Home({
           active={audience}
           currentParams={currentParams}
         />
+      </div>
+
+      <div className="mb-5">
+        {user ? (
+          <form action={followFilter}>
+            <input type="hidden" name="category" value={category} />
+            <input type="hidden" name="region" value={region} />
+            <input type="hidden" name="audience" value={audience} />
+            <button
+              type="submit"
+              className="rounded-lg border border-border bg-surface px-3 py-1.5 text-[12.5px] font-semibold text-ink-3 hover:text-ink"
+            >
+              + Follow this filter
+            </button>
+          </form>
+        ) : (
+          <Link
+            href="/login?next=/"
+            className="rounded-lg border border-border bg-surface px-3 py-1.5 text-[12.5px] font-semibold text-ink-3 hover:text-ink"
+          >
+            Sign in to follow filters
+          </Link>
+        )}
       </div>
 
       {feed.length > 0 ? (
