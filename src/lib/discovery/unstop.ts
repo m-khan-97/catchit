@@ -2,15 +2,22 @@ import "server-only";
 import type { Candidate } from "./schema";
 
 // Unstop's public API backs their own site search — undocumented but
-// stable and widely used by third-party aggregators. Covers hackathons and
-// scholarships with genuinely structured fields (real registration
-// deadlines, eligibility tags), unlike a scrape. Mostly India-skewed
-// listings, but "online"/no country restriction means most are genuinely
-// open to anyone — region_tags reflect that rather than excluding them;
-// the admin queue is the real filter for relevance, same as every source.
+// stable and widely used by third-party aggregators. Covers hackathons,
+// scholarships, and internships with genuinely structured fields (real
+// registration deadlines, eligibility tags), unlike a scrape. Mostly
+// India-skewed listings, but "online"/no country restriction means most
+// are genuinely open to anyone — region_tags reflect that rather than
+// excluding them; the admin queue is the real filter for relevance, same
+// as every source.
+//
+// The "internships" endpoint is actually a combined jobs+internships
+// board (195k+ total listings) — `subtypeFilter` discards anything whose
+// `subtype` isn't literally "internships", so full-time roles (Sales
+// Executive, Marketing Manager, etc.) never reach the internship category.
 const OPPORTUNITY_TYPES = [
-  { param: "hackathons", category: "hackathon" as const },
-  { param: "scholarships", category: "scholarship" as const },
+  { param: "hackathons", category: "hackathon" as const, subtypeFilter: null as string | null },
+  { param: "scholarships", category: "scholarship" as const, subtypeFilter: null as string | null },
+  { param: "internships", category: "internship" as const, subtypeFilter: "internships" },
 ];
 const PER_PAGE = 20;
 const USER_AGENT = "Mozilla/5.0 (compatible; CatchItBot/1.0)";
@@ -26,6 +33,7 @@ interface UnstopOpportunity {
   region: string | null;
   location: string | null;
   overall_prizes: string | null;
+  subtype: string | null;
   organisation: { name: string } | null;
   regnRequirements: {
     end_regn_dt: string | null;
@@ -85,16 +93,21 @@ export async function fetchUnstopCandidates(): Promise<{
   const candidates: Candidate[] = [];
   let discarded = 0;
 
-  for (const { param, category } of OPPORTUNITY_TYPES) {
+  for (const { param, category, subtypeFilter } of OPPORTUNITY_TYPES) {
     let items: UnstopOpportunity[];
     try {
       items = await fetchUnstopPage(param);
     } catch {
-      // one opportunity type failing shouldn't kill the other
+      // one opportunity type failing shouldn't kill the others
       continue;
     }
 
     for (const o of items) {
+      if (subtypeFilter && o.subtype !== subtypeFilter) {
+        discarded++;
+        continue;
+      }
+
       const deadlineRaw = o.regnRequirements?.end_regn_dt ?? null;
       const deadline = deadlineRaw ? new Date(deadlineRaw) : null;
       if (deadline && deadline.getTime() <= Date.now()) {
@@ -117,7 +130,8 @@ export async function fetchUnstopCandidates(): Promise<{
         eligibility: eligibilityFor(o),
         url: `https://unstop.com/${o.public_url}`,
         deadline: deadline ? deadline.toISOString() : null,
-        deadline_note: category === "scholarship" ? "Registration deadline" : null,
+        deadline_note:
+          category === "scholarship" || category === "internship" ? "Application deadline" : null,
         region_tags: regionTagsFor(o),
         audience_tags: ["students"],
       });
