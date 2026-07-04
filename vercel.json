@@ -9,6 +9,10 @@
       "schedule": "0 8 * * *"
     },
     {
+      "path": "/api/cron/deadline-alerts",
+      "schedule": "0 9 * * *"
+    },
+    {
       "path": "/api/cron/check-links",
       "schedule": "0 7 * * 1"
     },

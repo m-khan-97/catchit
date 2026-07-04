@@ -122,6 +122,8 @@ export type SavedOpportunity = {
   user_id: string;
   opportunity_id: string;
   created_at: string;
+  reminder_7d_sent_at: string | null;
+  reminder_48h_sent_at: string | null;
 };
 
 export type FollowedFilter = {

@@ -121,3 +121,33 @@ export function digestEmail(
 
   return { subject, html: shell(body, footer) };
 }
+
+export function deadlineReminderEmail(
+  opportunity: PublicOpportunity,
+  urgency: "7d" | "48h",
+  siteUrl: string
+): { subject: string; html: string } {
+  const headline = urgency === "48h" ? "Closes in 48 hours" : "Closes in a week";
+  const subject = `${headline}: ${opportunity.title}`;
+
+  const body = `
+    <tr><td style="padding-bottom:8px;">
+      <h1 style="margin:0 0 12px;font-size:22px;font-weight:700;color:${COLORS.ink};letter-spacing:-0.02em;">${escapeHtml(headline)} — you saved this one</h1>
+      <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:${COLORS.ink2};">
+        One of your saved opportunities is closing soon. Here it is again so it doesn't slip past you.
+      </p>
+    </td></tr>
+    <tr><td>${itemRow(opportunity, siteUrl)}</td></tr>
+    <tr><td style="padding-top:6px;">
+      <a href="${siteUrl}/opportunity/${opportunity.id}" style="display:inline-block;background:${COLORS.accent};color:${COLORS.accentInk};font-size:15px;font-weight:700;text-decoration:none;padding:13px 26px;border-radius:12px;">
+        View details
+      </a>
+    </td></tr>`;
+
+  const footer = `
+    You're getting this because you saved this opportunity in your CatchIt account.<br>
+    <a href="${siteUrl}/account" style="color:${COLORS.ink3};">Manage saved items</a> ·
+    <a href="${siteUrl}" style="color:${COLORS.ink3};">Browse everything</a>`;
+
+  return { subject, html: shell(body, footer) };
+}
