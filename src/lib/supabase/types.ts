@@ -135,6 +135,15 @@ export type FollowedFilter = {
   created_at: string;
 };
 
+export type PushSubscriptionRow = {
+  id: string;
+  user_id: string;
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  created_at: string;
+};
+
 export interface Database {
   public: {
     Tables: {
@@ -188,6 +197,13 @@ export interface Database {
         Row: FollowedFilter;
         Insert: Partial<FollowedFilter> & Pick<FollowedFilter, "user_id">;
         Update: Partial<FollowedFilter>;
+        Relationships: [];
+      };
+      push_subscriptions: {
+        Row: PushSubscriptionRow;
+        Insert: Partial<PushSubscriptionRow> &
+          Pick<PushSubscriptionRow, "user_id" | "endpoint" | "p256dh" | "auth">;
+        Update: Partial<PushSubscriptionRow>;
         Relationships: [];
       };
     };

@@ -83,3 +83,32 @@ export async function signOutAccount() {
   await supabase.auth.signOut();
   redirect("/");
 }
+
+interface PushSubscriptionInput {
+  endpoint: string;
+  keys: { p256dh: string; auth: string };
+}
+
+export async function savePushSubscription(subscription: PushSubscriptionInput) {
+  const { supabase, user } = await requireUser();
+
+  const { error } = await supabase.from("push_subscriptions").insert({
+    user_id: user.id,
+    endpoint: subscription.endpoint,
+    p256dh: subscription.keys.p256dh,
+    auth: subscription.keys.auth,
+  });
+  // 23505 = unique_violation — this browser is already subscribed.
+  if (error && error.code !== "23505") throw new Error(error.message);
+}
+
+export async function removePushSubscription(endpoint: string) {
+  const { supabase, user } = await requireUser();
+
+  const { error } = await supabase
+    .from("push_subscriptions")
+    .delete()
+    .eq("user_id", user.id)
+    .eq("endpoint", endpoint);
+  if (error) throw new Error(error.message);
+}

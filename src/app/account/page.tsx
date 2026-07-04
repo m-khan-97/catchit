@@ -6,6 +6,7 @@ import { CATEGORY_LABELS, AUDIENCE_LABELS, type FollowedFilter } from "@/lib/sup
 import { CategoryBadge } from "@/components/category-badge";
 import { formatDeadlineFull } from "@/lib/opportunities/format";
 import { unsaveOpportunity, unfollowFilter, signOutAccount } from "./actions";
+import { PushToggle } from "./push-toggle";
 
 export const metadata: Metadata = { title: "My account" };
 
@@ -85,6 +86,8 @@ export default async function AccountPage() {
           </code>
         </div>
       )}
+
+      <PushToggle />
 
       <h2 className="mb-3 font-display text-lg font-bold text-ink">Followed filters</h2>
       {(filters ?? []).length === 0 ? (
