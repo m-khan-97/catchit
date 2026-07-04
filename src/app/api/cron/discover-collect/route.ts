@@ -1,8 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { runLinkCheck } from "@/lib/link-check";
+import { collectDiscoveryBatches } from "@/lib/discovery/run";
 import { sendCronFailureAlert } from "@/lib/discord";
 
-export const maxDuration = 300;
+export const maxDuration = 120;
 
 export async function GET(request: NextRequest) {
   const auth = request.headers.get("authorization");
@@ -11,10 +11,10 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const summary = await runLinkCheck();
+    const summary = await collectDiscoveryBatches();
     return NextResponse.json(summary);
   } catch (err) {
-    await sendCronFailureAlert("Link check", err);
+    await sendCronFailureAlert("Discovery batch collection", err);
     return NextResponse.json(
       { error: err instanceof Error ? err.message : String(err) },
       { status: 500 }

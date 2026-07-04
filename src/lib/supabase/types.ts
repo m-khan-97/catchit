@@ -70,7 +70,7 @@ export type DiscoveryRun = {
   id: string;
   started_at: string;
   finished_at: string | null;
-  status: "running" | "completed" | "failed";
+  status: "running" | "awaiting_batch" | "completed" | "failed";
   source_counts: Record<
     string,
     { found: number; inserted: number; skipped: number; failed: number }
@@ -80,6 +80,16 @@ export type DiscoveryRun = {
   skipped_count: number;
   failed_count: number;
   error_notes: string | null;
+};
+
+export type DiscoveryBatch = {
+  id: string;
+  run_id: string;
+  batch_id: string;
+  task_map: Record<string, { category: string; query: string }>;
+  status: "submitted" | "collected" | "failed";
+  created_at: string;
+  collected_at: string | null;
 };
 
 export type AdminUser = {
@@ -130,6 +140,12 @@ export interface Database {
         Row: Subscriber;
         Insert: Partial<Subscriber> & Pick<Subscriber, "email">;
         Update: Partial<Subscriber>;
+        Relationships: [];
+      };
+      discovery_batches: {
+        Row: DiscoveryBatch;
+        Insert: Partial<DiscoveryBatch> & Pick<DiscoveryBatch, "run_id" | "batch_id" | "task_map">;
+        Update: Partial<DiscoveryBatch>;
         Relationships: [];
       };
     };

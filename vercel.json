@@ -5,6 +5,10 @@
       "schedule": "0 6 * * *"
     },
     {
+      "path": "/api/cron/discover-collect",
+      "schedule": "0 8 * * *"
+    },
+    {
       "path": "/api/cron/check-links",
       "schedule": "0 7 * * 1"
     },

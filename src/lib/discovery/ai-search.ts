@@ -33,20 +33,29 @@ export interface SearchResult {
   error?: string;
 }
 
-export async function searchForCandidates(query: string): Promise<SearchResult> {
-  // Haiku 4.5: cheap, well-suited to this targeted search-and-extract task.
-  // It doesn't support the newer web_search_20260209 (dynamic filtering)
-  // tool, adaptive thinking, or output_config.effort — those are Sonnet/
-  // Opus-tier features, so this call intentionally omits them rather than
-  // sending params that would error.
-  const response = await anthropic.messages.create({
-    model: "claude-haiku-4-5",
+// Haiku 4.5: cheap, well-suited to this targeted search-and-extract task. It
+// doesn't support the newer web_search_20260209 (dynamic filtering) tool,
+// adaptive thinking, or output_config.effort — those are Sonnet/Opus-tier
+// features, so this omits them rather than sending params that would error.
+// Shared between the synchronous path and Message Batch requests (identical
+// params either way — Batches just run them asynchronously at half price).
+export function buildSearchParams(query: string) {
+  return {
+    model: "claude-haiku-4-5" as const,
     max_tokens: 8192,
-    system: SYSTEM_PROMPT,
-    tools: [{ type: "web_search_20250305", name: "web_search", max_uses: 6 }],
-    messages: [{ role: "user", content: query }],
-  });
+    // Identical across every query — cache_control lets back-to-back
+    // synchronous calls in the same run hit the ~90% cache-read discount
+    // instead of re-billing the same system+tools prefix each time. Batch
+    // requests process independently, so this has little effect there, but
+    // it doesn't hurt to leave it on.
+    system: [{ type: "text" as const, text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" as const } }],
+    tools: [{ type: "web_search_20250305" as const, name: "web_search" as const, max_uses: 4 }],
+    messages: [{ role: "user" as const, content: query }],
+  };
+}
 
+/** Turns a completed Anthropic response (sync call or a batch result's `.result.message`) into a SearchResult. */
+export function extractSearchResult(response: Anthropic.Message): SearchResult {
   if (response.stop_reason === "refusal") {
     return { candidates: [], discarded: 0, error: "refusal" };
   }
@@ -70,4 +79,10 @@ export async function searchForCandidates(query: string): Promise<SearchResult> 
 
   const { candidates, discarded } = parseCandidates(text);
   return { candidates, discarded };
+}
+
+/** Synchronous single-query search — kept for local/manual testing; production runs use the batch path in batch.ts. */
+export async function searchForCandidates(query: string): Promise<SearchResult> {
+  const response = await anthropic.messages.create(buildSearchParams(query));
+  return extractSearchResult(response);
 }

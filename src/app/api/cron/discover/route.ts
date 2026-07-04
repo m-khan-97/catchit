@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { runDiscovery } from "@/lib/discovery/run";
+import { sendCronFailureAlert } from "@/lib/discord";
 
 export const maxDuration = 300;
 
@@ -13,6 +14,7 @@ export async function GET(request: NextRequest) {
     const summary = await runDiscovery();
     return NextResponse.json(summary);
   } catch (err) {
+    await sendCronFailureAlert("Discovery", err);
     return NextResponse.json(
       { error: err instanceof Error ? err.message : String(err) },
       { status: 500 }

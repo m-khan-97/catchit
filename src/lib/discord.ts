@@ -3,10 +3,20 @@ import { CATEGORY_LABELS, type Opportunity } from "@/lib/supabase/types";
 import { formatDeadlineFull } from "@/lib/opportunities/format";
 
 const ACCENT_COLOR = 0xc7f04a;
+const ALERT_COLOR = 0xe5484d;
 // Discord hard-caps embeds per message at 10.
 const MAX_EMBEDS_PER_MESSAGE = 10;
 
-function buildEmbed(opportunity: Opportunity) {
+interface DiscordEmbed {
+  title: string;
+  url?: string;
+  description: string;
+  color: number;
+  fields: { name: string; value: string; inline?: boolean }[];
+  footer: { text: string };
+}
+
+function buildEmbed(opportunity: Opportunity): DiscordEmbed {
   const fields = [
     { name: "Category", value: CATEGORY_LABELS[opportunity.category], inline: true },
     { name: "Deadline", value: formatDeadlineFull(opportunity.deadline), inline: true },
@@ -25,7 +35,7 @@ function buildEmbed(opportunity: Opportunity) {
   };
 }
 
-async function postEmbeds(webhookUrl: string, embeds: ReturnType<typeof buildEmbed>[]): Promise<void> {
+async function postEmbeds(webhookUrl: string, embeds: DiscordEmbed[]): Promise<void> {
   try {
     const res = await fetch(webhookUrl, {
       method: "POST",
@@ -66,4 +76,25 @@ export async function sendBulkApprovalNotifications(opportunities: Opportunity[]
     const batch = opportunities.slice(i, i + MAX_EMBEDS_PER_MESSAGE);
     await postEmbeds(webhookUrl, batch.map(buildEmbed));
   }
+}
+
+/**
+ * Posts a red alert embed when a cron job throws — a silent cron failure
+ * means the radar quietly goes stale with nobody noticing. Same
+ * never-throws contract as the approval notifications.
+ */
+export async function sendCronFailureAlert(jobName: string, error: unknown): Promise<void> {
+  const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+  if (!webhookUrl) return;
+
+  const message = error instanceof Error ? error.message : String(error);
+  await postEmbeds(webhookUrl, [
+    {
+      title: `⚠️ ${jobName} cron failed`,
+      description: `\`\`\`${message.slice(0, 1500)}\`\`\``,
+      color: ALERT_COLOR,
+      fields: [],
+      footer: { text: `CatchIt · ${new Date().toISOString()}` },
+    },
+  ]);
 }

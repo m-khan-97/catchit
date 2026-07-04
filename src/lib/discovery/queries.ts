@@ -9,6 +9,22 @@ function currentMonthYear(): string {
   return `${d.toLocaleString("en-US", { month: "long" })} ${d.getFullYear()}`;
 }
 
+// Vouchers, journal special issues, scholarships, and conference CFPs barely
+// change day to day (a new student discount or CFP doesn't appear and vanish
+// within 24h the way a hackathon registration deadline can), so restricting
+// them to 2 fixed days a week loses almost no real freshness while cutting
+// their AI-search query volume by roughly 5/7 — the bulk of the daily bill.
+// Only `event` and `internship` (genuinely time-sensitive — registration
+// windows that can close with little notice) stay on daily cadence.
+const LOW_CHURN_CATEGORIES = new Set(["voucher", "journal", "scholarship", "conference"]);
+// Monday and Thursday (UTC) — spread across the week, cron-independent.
+const LOW_CHURN_DAYS_UTC = new Set([1, 4]);
+
+export function shouldRunCategoryToday(category: string): boolean {
+  if (!LOW_CHURN_CATEGORIES.has(category)) return true;
+  return LOW_CHURN_DAYS_UTC.has(new Date().getUTCDay());
+}
+
 export const QUERY_POOLS: Record<string, string[]> = {
   voucher: [
     `new free student software credits ${currentMonthYear()}`,
