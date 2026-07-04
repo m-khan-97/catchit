@@ -2,6 +2,7 @@ import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { fetchDevpostCandidates } from "./devpost";
 import { fetchWikiCfpCandidates } from "./wikicfp";
+import { fetchUnstopCandidates } from "./unstop";
 import { submitSearchBatch, pollSearchBatch, type BatchTask } from "./batch";
 import { QUERY_POOLS, pickQueriesForToday, shouldRunCategoryToday } from "./queries";
 import { dedupCandidates } from "./dedup";
@@ -169,6 +170,22 @@ export async function runDiscovery(): Promise<DiscoveryRunSummary> {
     } catch (err) {
       sourceCounts.wikicfp = { found: 0, inserted: 0, skipped: 0, failed: 0 };
       errorNotes.push(`wikicfp: ${err instanceof Error ? err.message : String(err)}`);
+    }
+
+    // 2.5. Unstop — structured, free coverage for hackathons + scholarships,
+    // supplementing Devpost and the AI-search scholarship queries.
+    try {
+      const { candidates, discarded } = await fetchUnstopCandidates();
+      sourceCounts.unstop = {
+        found: candidates.length + discarded,
+        inserted: 0,
+        skipped: 0,
+        failed: discarded,
+      };
+      for (const candidate of candidates) rawEntries.push({ source: "unstop", candidate });
+    } catch (err) {
+      sourceCounts.unstop = { found: 0, inserted: 0, skipped: 0, failed: 0 };
+      errorNotes.push(`unstop: ${err instanceof Error ? err.message : String(err)}`);
     }
 
     const { inserted, skipped, failedInserts, errorNotes: insertErrors } =
