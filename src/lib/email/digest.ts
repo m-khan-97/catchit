@@ -3,18 +3,10 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { mapWithConcurrency } from "@/lib/concurrency";
 import { sendEmail } from "./resend";
 import { digestEmail } from "./templates";
-import type { PublicOpportunity, Subscriber } from "@/lib/supabase/types";
+import { matchesFilter } from "@/lib/opportunities/filters";
 
 const SEND_CONCURRENCY = 5;
 const MAX_ITEMS_PER_SECTION = 8;
-
-function matchesPrefs(o: PublicOpportunity, sub: Subscriber): boolean {
-  if (sub.categories.length > 0 && !sub.categories.includes(o.category)) return false;
-  if (sub.audiences.length > 0 && !o.audience_tags.some((a) => sub.audiences.includes(a)))
-    return false;
-  if (sub.regions.length > 0 && !o.region_tags.some((r) => sub.regions.includes(r))) return false;
-  return true;
-}
 
 export interface DigestRunSummary {
   subscribers: number;
@@ -62,8 +54,8 @@ export async function runDigest(): Promise<DigestRunSummary> {
   let failed = 0;
 
   await mapWithConcurrency(subscribers, SEND_CONCURRENCY, async (sub) => {
-    const closingSoon = closingSoonAll.filter((o) => matchesPrefs(o, sub)).slice(0, MAX_ITEMS_PER_SECTION);
-    const newThisWeek = newThisWeekAll.filter((o) => matchesPrefs(o, sub)).slice(0, MAX_ITEMS_PER_SECTION);
+    const closingSoon = closingSoonAll.filter((o) => matchesFilter(o, sub)).slice(0, MAX_ITEMS_PER_SECTION);
+    const newThisWeek = newThisWeekAll.filter((o) => matchesFilter(o, sub)).slice(0, MAX_ITEMS_PER_SECTION);
 
     if (closingSoon.length === 0 && newThisWeek.length === 0) {
       // Nothing matched their filters this week — sending an empty email

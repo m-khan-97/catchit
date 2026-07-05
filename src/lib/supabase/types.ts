@@ -115,6 +115,8 @@ export type Profile = {
   id: string;
   calendar_token: string;
   created_at: string;
+  preferred_audience: string[];
+  preferred_regions: string[];
 };
 
 export const APPLICATION_STATUSES = ["saved", "applied", "got_it", "no_luck"] as const;
@@ -146,6 +148,7 @@ export type FollowedFilter = {
   regions: string[];
   audiences: string[];
   created_at: string;
+  last_alerted_at: string;
 };
 
 export type PushSubscriptionRow = {
@@ -266,3 +269,5 @@ export const AUDIENCE_LABELS: Record<AudienceTag, string> = {
   researchers: "Researchers",
   professionals: "Professionals",
 };
+
+export const REGIONS = ["UK", "Remote", "Global"] as const;

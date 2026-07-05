@@ -10,9 +10,11 @@ const SAVE_COUNT_DISPLAY_THRESHOLD = 3;
 export function OpportunityCard({
   opportunity,
   savedCount,
+  matchesYou,
 }: {
   opportunity: PublicOpportunity;
   savedCount?: number;
+  matchesYou?: boolean;
 }) {
   return (
     <Link
@@ -22,6 +24,11 @@ export function OpportunityCard({
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <CategoryBadge category={opportunity.category} />
         <UrgencyBadge deadline={opportunity.deadline} />
+        {matchesYou && (
+          <span className="rounded-full bg-ok-bg px-2 py-0.5 text-[11.5px] font-semibold text-ok">
+            ✓ Matches you
+          </span>
+        )}
         {savedCount !== undefined && savedCount >= SAVE_COUNT_DISPLAY_THRESHOLD && (
           <span className="text-[12px] font-semibold text-ink-4">🔥 {savedCount} saved</span>
         )}

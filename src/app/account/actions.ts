@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { CATEGORIES, AUDIENCE_TAGS, APPLICATION_STATUSES, type ApplicationStatus } from "@/lib/supabase/types";
+import { CATEGORIES, AUDIENCE_TAGS, REGIONS, APPLICATION_STATUSES, type ApplicationStatus } from "@/lib/supabase/types";
 
 async function requireUser() {
   const supabase = await createClient();
@@ -69,6 +69,28 @@ export async function setSavedNote(opportunityId: string, note: string) {
     .eq("opportunity_id", opportunityId);
   if (error) throw new Error(error.message);
 
+  revalidatePath("/account");
+}
+
+export async function setPreferences(formData: FormData) {
+  const { supabase, user } = await requireUser();
+
+  const audiences = formData
+    .getAll("preferred_audience")
+    .map(String)
+    .filter((a) => (AUDIENCE_TAGS as readonly string[]).includes(a));
+  const regions = formData
+    .getAll("preferred_regions")
+    .map(String)
+    .filter((r) => (REGIONS as readonly string[]).includes(r));
+
+  const { error } = await supabase
+    .from("profiles")
+    .update({ preferred_audience: audiences, preferred_regions: regions })
+    .eq("id", user.id);
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/");
   revalidatePath("/account");
 }
 

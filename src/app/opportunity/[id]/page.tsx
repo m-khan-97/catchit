@@ -11,6 +11,7 @@ import { googleCalendarUrl } from "@/lib/opportunities/calendar";
 import { formatDeadlineFull, hostOf } from "@/lib/opportunities/format";
 import { CATEGORY_LABELS } from "@/lib/supabase/types";
 import { saveOpportunity, unsaveOpportunity } from "@/app/account/actions";
+import { matchesPreferences } from "@/lib/opportunities/filters";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -46,14 +47,19 @@ export default async function OpportunityPage({ params }: PageProps) {
   } = await supabase.auth.getUser();
 
   let isSaved = false;
+  let profile: { preferred_audience: string[]; preferred_regions: string[] } | null = null;
   if (user) {
-    const { data } = await supabase
-      .from("saved_opportunities")
-      .select("id")
-      .eq("user_id", user.id)
-      .eq("opportunity_id", sel.id)
-      .maybeSingle();
-    isSaved = Boolean(data);
+    const [{ data: savedRow }, { data: profileRow }] = await Promise.all([
+      supabase
+        .from("saved_opportunities")
+        .select("id")
+        .eq("user_id", user.id)
+        .eq("opportunity_id", sel.id)
+        .maybeSingle(),
+      supabase.from("profiles").select("preferred_audience,preferred_regions").eq("id", user.id).maybeSingle(),
+    ]);
+    isSaved = Boolean(savedRow);
+    profile = profileRow;
   }
 
   const region = sel.region_tags.join(", ") || "Region unspecified";
@@ -75,6 +81,11 @@ export default async function OpportunityPage({ params }: PageProps) {
       <div className="mb-3.5 flex flex-wrap items-center gap-2">
         <CategoryBadge category={sel.category} />
         <UrgencyBadge deadline={sel.deadline} />
+        {profile && matchesPreferences(sel, profile) && (
+          <span className="rounded-full bg-ok-bg px-2 py-0.5 text-[11.5px] font-semibold text-ok">
+            ✓ Matches you
+          </span>
+        )}
         {counts && counts.savedCount >= 3 && (
           <span className="text-[12.5px] font-semibold text-ink-4">
             🔥 {counts.savedCount} saved
@@ -176,6 +187,7 @@ export default async function OpportunityPage({ params }: PageProps) {
                 key={o.id}
                 opportunity={o}
                 savedCount={engagementCounts.get(o.id)?.savedCount}
+                matchesYou={profile ? matchesPreferences(o, profile) : false}
               />
             ))}
           </div>

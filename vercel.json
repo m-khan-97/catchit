@@ -13,6 +13,10 @@
       "schedule": "0 9 * * *"
     },
     {
+      "path": "/api/cron/new-match-alerts",
+      "schedule": "0 12 * * *"
+    },
+    {
       "path": "/api/cron/check-links",
       "schedule": "0 7 * * 1"
     },

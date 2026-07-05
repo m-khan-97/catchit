@@ -2,10 +2,16 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { CATEGORY_LABELS, AUDIENCE_LABELS, type FollowedFilter } from "@/lib/supabase/types";
+import {
+  CATEGORY_LABELS,
+  AUDIENCE_LABELS,
+  AUDIENCE_TAGS,
+  REGIONS,
+  type FollowedFilter,
+} from "@/lib/supabase/types";
 import { CategoryBadge } from "@/components/category-badge";
 import { formatDeadlineFull } from "@/lib/opportunities/format";
-import { unsaveOpportunity, unfollowFilter, signOutAccount } from "./actions";
+import { unsaveOpportunity, unfollowFilter, signOutAccount, setPreferences } from "./actions";
 import { PushToggle } from "./push-toggle";
 import { StatusSelect } from "./status-select";
 import { NoteInput } from "./note-input";
@@ -92,6 +98,62 @@ export default async function AccountPage() {
       )}
 
       <PushToggle />
+
+      <div className="mb-7 rounded-2xl border border-border bg-surface px-5 py-4">
+        <div className="mb-1 font-display text-[15px] font-semibold text-ink">
+          Your eligibility profile
+        </div>
+        <p className="mb-3 text-[13.5px] text-ink-3">
+          Pick what applies to you and the feed will badge opportunities that match —
+          study level and region, no new fields to fill in per item.
+        </p>
+        <form action={setPreferences} className="flex flex-col gap-3">
+          <div>
+            <div className="mb-1.5 text-[11.5px] font-medium tracking-[0.04em] text-ink-4 uppercase">
+              Study level
+            </div>
+            <div className="flex flex-wrap gap-3">
+              {AUDIENCE_TAGS.map((a) => (
+                <label key={a} className="flex items-center gap-1.5 text-[13.5px] text-ink-2">
+                  <input
+                    type="checkbox"
+                    name="preferred_audience"
+                    value={a}
+                    defaultChecked={profile?.preferred_audience.includes(a) ?? false}
+                    className="size-4 accent-accent"
+                  />
+                  {AUDIENCE_LABELS[a]}
+                </label>
+              ))}
+            </div>
+          </div>
+          <div>
+            <div className="mb-1.5 text-[11.5px] font-medium tracking-[0.04em] text-ink-4 uppercase">
+              Region
+            </div>
+            <div className="flex flex-wrap gap-3">
+              {REGIONS.map((r) => (
+                <label key={r} className="flex items-center gap-1.5 text-[13.5px] text-ink-2">
+                  <input
+                    type="checkbox"
+                    name="preferred_regions"
+                    value={r}
+                    defaultChecked={profile?.preferred_regions.includes(r) ?? false}
+                    className="size-4 accent-accent"
+                  />
+                  {r}
+                </label>
+              ))}
+            </div>
+          </div>
+          <button
+            type="submit"
+            className="self-start rounded-lg border border-border bg-bg px-3.5 py-2 text-sm font-semibold text-ink-3 hover:text-ink"
+          >
+            Save preferences
+          </button>
+        </form>
+      </div>
 
       <h2 className="mb-3 font-display text-lg font-bold text-ink">Followed filters</h2>
       {(filters ?? []).length === 0 ? (

@@ -151,3 +151,27 @@ export function deadlineReminderEmail(
 
   return { subject, html: shell(body, footer) };
 }
+
+export function newMatchesEmail(
+  items: PublicOpportunity[],
+  siteUrl: string
+): { subject: string; html: string } {
+  const count = items.length;
+  const subject = `${count} new opportunit${count === 1 ? "y matches" : "ies match"} your filters`;
+
+  const body = `
+    <tr><td style="padding-bottom:8px;">
+      <h1 style="margin:0 0 12px;font-size:22px;font-weight:700;color:${COLORS.ink};letter-spacing:-0.02em;">New on your radar</h1>
+      <p style="margin:0 0 20px;font-size:15px;line-height:1.6;color:${COLORS.ink2};">
+        ${count} new opportunit${count === 1 ? "y matches" : "ies match"} one of your followed filters.
+      </p>
+    </td></tr>
+    <tr><td>${items.map((o) => itemRow(o, siteUrl)).join("")}</td></tr>`;
+
+  const footer = `
+    You're getting this because you followed a filter in your CatchIt account.<br>
+    <a href="${siteUrl}/account" style="color:${COLORS.ink3};">Manage followed filters</a> ·
+    <a href="${siteUrl}" style="color:${COLORS.ink3};">Browse everything</a>`;
+
+  return { subject, html: shell(body, footer) };
+}

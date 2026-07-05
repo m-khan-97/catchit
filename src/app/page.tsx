@@ -1,14 +1,13 @@
 import Link from "next/link";
 import { getFeed, getEngagementCounts } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/server";
-import { CATEGORIES, CATEGORY_LABELS, AUDIENCE_TAGS, AUDIENCE_LABELS } from "@/lib/supabase/types";
+import { CATEGORIES, CATEGORY_LABELS, AUDIENCE_TAGS, AUDIENCE_LABELS, REGIONS } from "@/lib/supabase/types";
 import { CATEGORY_STYLES } from "@/lib/opportunities/styles";
 import { FilterChips, type ChipOption } from "@/components/filter-chips";
 import { OpportunityCard } from "@/components/opportunity-card";
 import { DigestSignup } from "@/components/digest-signup";
 import { followFilter } from "@/app/account/actions";
-
-const REGIONS = ["UK", "Remote", "Global"];
+import { matchesPreferences } from "@/lib/opportunities/filters";
 
 type SearchParams = { [key: string]: string | string[] | undefined };
 
@@ -37,6 +36,10 @@ export default async function Home({
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  const { data: profile } = user
+    ? await supabase.from("profiles").select("preferred_audience,preferred_regions").eq("id", user.id).maybeSingle()
+    : { data: null };
 
   const currentParams = new URLSearchParams();
   if (category !== "all") currentParams.set("category", category);
@@ -189,6 +192,7 @@ export default async function Home({
               key={o.id}
               opportunity={o}
               savedCount={engagementCounts.get(o.id)?.savedCount}
+              matchesYou={profile ? matchesPreferences(o, profile) : false}
             />
           ))}
         </div>

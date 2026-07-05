@@ -2,6 +2,7 @@ import { createEvents, type EventAttributes } from "ics";
 import type { NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { matchesFilter } from "@/lib/opportunities/filters";
 
 interface CalendarOpportunity {
   id: string;
@@ -13,19 +14,6 @@ interface CalendarOpportunity {
   category: string;
   region_tags: string[];
   audience_tags: string[];
-}
-
-interface FilterLike {
-  categories: string[];
-  regions: string[];
-  audiences: string[];
-}
-
-function matchesFilter(o: CalendarOpportunity, f: FilterLike): boolean {
-  if (f.categories.length > 0 && !f.categories.includes(o.category)) return false;
-  if (f.regions.length > 0 && !o.region_tags.some((r) => f.regions.includes(r))) return false;
-  if (f.audiences.length > 0 && !o.audience_tags.some((a) => f.audiences.includes(a))) return false;
-  return true;
 }
 
 const CALENDAR_COLUMNS = "id,title,organization,url,deadline,deadline_note,category,region_tags,audience_tags";
