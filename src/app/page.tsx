@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getFeed } from "@/lib/supabase/queries";
+import { getFeed, getEngagementCounts } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/server";
 import { CATEGORIES, CATEGORY_LABELS, AUDIENCE_TAGS, AUDIENCE_LABELS } from "@/lib/supabase/types";
 import { CATEGORY_STYLES } from "@/lib/opportunities/styles";
@@ -28,7 +28,10 @@ export default async function Home({
   const q = first(sp.q);
   const urgent = first(sp.urgent) === "1";
 
-  const feed = await getFeed({ category, region, audience, q, urgent });
+  const [feed, engagementCounts] = await Promise.all([
+    getFeed({ category, region, audience, q, urgent }),
+    getEngagementCounts(),
+  ]);
 
   const supabase = await createClient();
   const {
@@ -182,7 +185,11 @@ export default async function Home({
       {feed.length > 0 ? (
         <div className="flex flex-col gap-3">
           {feed.map((o) => (
-            <OpportunityCard key={o.id} opportunity={o} />
+            <OpportunityCard
+              key={o.id}
+              opportunity={o}
+              savedCount={engagementCounts.get(o.id)?.savedCount}
+            />
           ))}
         </div>
       ) : (

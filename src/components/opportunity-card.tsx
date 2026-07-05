@@ -3,7 +3,17 @@ import type { PublicOpportunity } from "@/lib/supabase/types";
 import { CategoryBadge } from "./category-badge";
 import { UrgencyBadge } from "./urgency-badge";
 
-export function OpportunityCard({ opportunity }: { opportunity: PublicOpportunity }) {
+// Below this, "N saved" reads as noise rather than signal — most items
+// won't clear it yet, and that's fine, it's meant to surface real traction.
+const SAVE_COUNT_DISPLAY_THRESHOLD = 3;
+
+export function OpportunityCard({
+  opportunity,
+  savedCount,
+}: {
+  opportunity: PublicOpportunity;
+  savedCount?: number;
+}) {
   return (
     <Link
       href={`/opportunity/${opportunity.id}`}
@@ -12,6 +22,9 @@ export function OpportunityCard({ opportunity }: { opportunity: PublicOpportunit
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <CategoryBadge category={opportunity.category} />
         <UrgencyBadge deadline={opportunity.deadline} />
+        {savedCount !== undefined && savedCount >= SAVE_COUNT_DISPLAY_THRESHOLD && (
+          <span className="text-[12px] font-semibold text-ink-4">🔥 {savedCount} saved</span>
+        )}
       </div>
       <div className="flex items-start gap-3">
         <div className="min-w-0 flex-1">

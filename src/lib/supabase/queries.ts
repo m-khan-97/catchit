@@ -102,6 +102,27 @@ export async function getSimilarOpportunities(
   return data ?? [];
 }
 
+export interface EngagementCounts {
+  savedCount: number;
+  appliedCount: number;
+}
+
+/**
+ * "N saved / M applied" social-proof counts, keyed by opportunity id.
+ * Sparse by design — most opportunities won't have an entry yet, callers
+ * should treat a missing key as zero rather than an error.
+ */
+export async function getEngagementCounts(): Promise<Map<string, EngagementCounts>> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("get_save_counts");
+  if (error) throw error;
+
+  const rows = (data ?? []) as { opportunity_id: string; saved_count: number; applied_count: number }[];
+  return new Map(
+    rows.map((r) => [r.opportunity_id, { savedCount: r.saved_count, appliedCount: r.applied_count }])
+  );
+}
+
 export interface FeedStats {
   total: number;
   live: number;

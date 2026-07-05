@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getOpportunityById, getSimilarOpportunities } from "@/lib/supabase/queries";
+import { getOpportunityById, getSimilarOpportunities, getEngagementCounts } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/server";
 import { CategoryBadge } from "@/components/category-badge";
 import { UrgencyBadge } from "@/components/urgency-badge";
@@ -57,7 +57,11 @@ export default async function OpportunityPage({ params }: PageProps) {
   }
 
   const region = sel.region_tags.join(", ") || "Region unspecified";
-  const similar = await getSimilarOpportunities(sel);
+  const [similar, engagementCounts] = await Promise.all([
+    getSimilarOpportunities(sel),
+    getEngagementCounts(),
+  ]);
+  const counts = engagementCounts.get(sel.id);
 
   return (
     <section>
@@ -71,6 +75,12 @@ export default async function OpportunityPage({ params }: PageProps) {
       <div className="mb-3.5 flex flex-wrap items-center gap-2">
         <CategoryBadge category={sel.category} />
         <UrgencyBadge deadline={sel.deadline} />
+        {counts && counts.savedCount >= 3 && (
+          <span className="text-[12.5px] font-semibold text-ink-4">
+            🔥 {counts.savedCount} saved
+            {counts.appliedCount > 0 ? ` · ${counts.appliedCount} applied` : ""}
+          </span>
+        )}
         <div className="ml-auto">
           {user ? (
             <form action={(isSaved ? unsaveOpportunity : saveOpportunity).bind(null, sel.id)}>
@@ -162,7 +172,11 @@ export default async function OpportunityPage({ params }: PageProps) {
           </h2>
           <div className="mb-7.5 flex flex-col gap-3">
             {similar.map((o) => (
-              <OpportunityCard key={o.id} opportunity={o} />
+              <OpportunityCard
+                key={o.id}
+                opportunity={o}
+                savedCount={engagementCounts.get(o.id)?.savedCount}
+              />
             ))}
           </div>
         </>
