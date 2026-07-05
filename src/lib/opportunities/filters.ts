@@ -25,15 +25,17 @@ export interface PreferenceLike {
 }
 
 /**
- * "✓ Matches you" badge check — true only if the user has actually set a
- * preference AND it overlaps. No preferences set = no badge, not a
- * trivially-true match.
+ * "✓ Matches you" badge check — true if the user set a preference AND it
+ * overlaps on *either* axis (not both at once). Audience and region are
+ * independent signals — most researcher-tagged opportunities are Global/
+ * Remote, not region-specific, so requiring both would near-permanently
+ * fail for e.g. a UK-based researcher. No preferences set at all = no badge.
  */
 export function matchesPreferences(o: TaggedOpportunity, p: PreferenceLike): boolean {
   if (p.preferred_audience.length === 0 && p.preferred_regions.length === 0) return false;
-  const audienceOk =
-    p.preferred_audience.length === 0 || o.audience_tags.some((a) => p.preferred_audience.includes(a));
-  const regionOk =
-    p.preferred_regions.length === 0 || o.region_tags.some((r) => p.preferred_regions.includes(r));
-  return audienceOk && regionOk;
+  const audienceMatch =
+    p.preferred_audience.length > 0 && o.audience_tags.some((a) => p.preferred_audience.includes(a));
+  const regionMatch =
+    p.preferred_regions.length > 0 && o.region_tags.some((r) => p.preferred_regions.includes(r));
+  return audienceMatch || regionMatch;
 }
