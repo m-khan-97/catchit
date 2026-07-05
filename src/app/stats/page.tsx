@@ -14,6 +14,8 @@ export default async function StatsPage() {
     { value: stats.live, label: "Currently live" },
     { value: stats.closingSoon, label: "Closing within a week" },
     { value: stats.sources, label: "Sources represented" },
+    { value: stats.applied, label: "Applications tracked by users" },
+    { value: stats.gotIt, label: "Reported successes" },
   ];
 
   return (

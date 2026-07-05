@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { CATEGORIES, AUDIENCE_TAGS } from "@/lib/supabase/types";
+import { CATEGORIES, AUDIENCE_TAGS, APPLICATION_STATUSES, type ApplicationStatus } from "@/lib/supabase/types";
 
 async function requireUser() {
   const supabase = await createClient();
@@ -39,6 +39,24 @@ export async function unsaveOpportunity(opportunityId: string) {
 
   revalidatePath("/opportunity/[id]", "page");
   revalidatePath("/account");
+}
+
+export async function setApplicationStatus(opportunityId: string, status: string) {
+  const { supabase, user } = await requireUser();
+
+  if (!(APPLICATION_STATUSES as readonly string[]).includes(status)) {
+    throw new Error("Invalid status");
+  }
+
+  const { error } = await supabase
+    .from("saved_opportunities")
+    .update({ status: status as ApplicationStatus, status_updated_at: new Date().toISOString() })
+    .eq("user_id", user.id)
+    .eq("opportunity_id", opportunityId);
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/account");
+  revalidatePath("/stats");
 }
 
 export async function followFilter(formData: FormData) {

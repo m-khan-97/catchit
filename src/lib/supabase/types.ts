@@ -117,6 +117,16 @@ export type Profile = {
   created_at: string;
 };
 
+export const APPLICATION_STATUSES = ["saved", "applied", "got_it", "no_luck"] as const;
+export type ApplicationStatus = (typeof APPLICATION_STATUSES)[number];
+
+export const APPLICATION_STATUS_LABELS: Record<ApplicationStatus, string> = {
+  saved: "Saved",
+  applied: "Applied",
+  got_it: "Got it! 🎉",
+  no_luck: "No luck",
+};
+
 export type SavedOpportunity = {
   id: string;
   user_id: string;
@@ -124,6 +134,8 @@ export type SavedOpportunity = {
   created_at: string;
   reminder_7d_sent_at: string | null;
   reminder_48h_sent_at: string | null;
+  status: ApplicationStatus;
+  status_updated_at: string;
 };
 
 export type FollowedFilter = {

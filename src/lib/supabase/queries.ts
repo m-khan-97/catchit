@@ -18,6 +18,7 @@ export interface FeedFilters {
   region?: string;
   audience?: string;
   q?: string;
+  urgent?: boolean;
 }
 
 /**
@@ -50,6 +51,10 @@ export async function getFeed(filters: FeedFilters): Promise<PublicOpportunity[]
       query = query.or(`title.ilike.%${q}%,organization.ilike.%${q}%,snippet.ilike.%${q}%`);
     }
   }
+  if (filters.urgent) {
+    const weekAheadIso = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+    query = query.not("deadline", "is", null).lte("deadline", weekAheadIso);
+  }
 
   const { data, error } = await query;
   if (error) throw error;
@@ -77,6 +82,8 @@ export interface FeedStats {
   live: number;
   closingSoon: number;
   sources: number;
+  applied: number;
+  gotIt: number;
 }
 
 export async function getStats(): Promise<FeedStats> {
@@ -84,7 +91,7 @@ export async function getStats(): Promise<FeedStats> {
   const nowIso = new Date().toISOString();
   const weekAheadIso = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
 
-  const [totalRes, liveRes, closingSoonRes, sourcesRes] = await Promise.all([
+  const [totalRes, liveRes, closingSoonRes, sourcesRes, applicationStatsRes] = await Promise.all([
     supabase.from("opportunities_public").select("*", { count: "exact", head: true }),
     supabase
       .from("opportunities_public")
@@ -96,19 +103,26 @@ export async function getStats(): Promise<FeedStats> {
       .gte("deadline", nowIso)
       .lte("deadline", weekAheadIso),
     supabase.from("opportunities_public").select("source"),
+    supabase.rpc("get_application_stats"),
   ]);
 
   if (totalRes.error) throw totalRes.error;
   if (liveRes.error) throw liveRes.error;
   if (closingSoonRes.error) throw closingSoonRes.error;
   if (sourcesRes.error) throw sourcesRes.error;
+  if (applicationStatsRes.error) throw applicationStatsRes.error;
 
   const sources = new Set((sourcesRes.data ?? []).map((r) => r.source));
+  const applicationStatsRow = (
+    applicationStatsRes.data as { applied: number; got_it: number }[] | null
+  )?.[0];
 
   return {
     total: totalRes.count ?? 0,
     live: liveRes.count ?? 0,
     closingSoon: closingSoonRes.count ?? 0,
     sources: sources.size,
+    applied: applicationStatsRow?.applied ?? 0,
+    gotIt: applicationStatsRow?.got_it ?? 0,
   };
 }

@@ -26,8 +26,9 @@ export default async function Home({
   const region = first(sp.region) || "all";
   const audience = first(sp.audience) || "all";
   const q = first(sp.q);
+  const urgent = first(sp.urgent) === "1";
 
-  const feed = await getFeed({ category, region, audience, q });
+  const feed = await getFeed({ category, region, audience, q, urgent });
 
   const supabase = await createClient();
   const {
@@ -39,6 +40,7 @@ export default async function Home({
   if (region !== "all") currentParams.set("region", region);
   if (audience !== "all") currentParams.set("audience", audience);
   if (q) currentParams.set("q", q);
+  if (urgent) currentParams.set("urgent", "1");
 
   const categoryOptions: ChipOption[] = [
     { value: "all", label: "All" },
@@ -60,6 +62,12 @@ export default async function Home({
   // preserve active filters (minus q) when the search box round-trips via GET
   const searchHiddenParams = new URLSearchParams(currentParams);
   searchHiddenParams.delete("q");
+
+  const urgentToggleParams = new URLSearchParams(currentParams);
+  if (urgent) urgentToggleParams.delete("urgent");
+  else urgentToggleParams.set("urgent", "1");
+  const urgentToggleQs = urgentToggleParams.toString();
+  const urgentToggleHref = urgentToggleQs ? `/?${urgentToggleQs}` : "/";
 
   return (
     <section>
@@ -104,6 +112,20 @@ export default async function Home({
           className="w-full rounded-2xl border border-border bg-surface py-[13px] pr-4 pl-[38px] text-[15px] focus:border-focus focus:shadow-[0_0_0_3px_rgba(199,240,74,0.35)]"
         />
       </form>
+
+      <div className="mb-2.5 flex flex-wrap gap-1.5">
+        <Link
+          href={urgentToggleHref}
+          data-umami-event="urgent_filter_toggle"
+          className={
+            urgent
+              ? "inline-flex items-center gap-1.5 rounded-full border border-danger bg-danger-bg px-3 py-1.5 text-[13px] font-semibold text-danger-ink"
+              : "inline-flex items-center gap-1.5 rounded-full border border-border bg-surface px-3 py-1.5 text-[13px] font-semibold text-ink-3 hover:text-ink-2"
+          }
+        >
+          ⏰ Closing this week
+        </Link>
+      </div>
 
       <div className="mb-2.5 flex flex-wrap gap-1.5">
         <FilterChips

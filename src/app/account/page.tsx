@@ -7,6 +7,7 @@ import { CategoryBadge } from "@/components/category-badge";
 import { formatDeadlineFull } from "@/lib/opportunities/format";
 import { unsaveOpportunity, unfollowFilter, signOutAccount } from "./actions";
 import { PushToggle } from "./push-toggle";
+import { StatusSelect } from "./status-select";
 
 export const metadata: Metadata = { title: "My account" };
 
@@ -50,6 +51,8 @@ export default async function AccountPage() {
     savedIds.length > 0
       ? await supabase.from("opportunities_public").select("*").in("id", savedIds)
       : { data: [] };
+
+  const statusByOpportunityId = new Map((savedRows ?? []).map((r) => [r.opportunity_id, r.status]));
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const calendarUrl = profile ? `${siteUrl}/calendar.ics?token=${profile.calendar_token}` : null;
@@ -141,6 +144,7 @@ export default async function AccountPage() {
                   {o.organization} · {formatDeadlineFull(o.deadline)}
                 </div>
               </div>
+              <StatusSelect opportunityId={o.id} status={statusByOpportunityId.get(o.id) ?? "saved"} />
               <form action={unsaveOpportunity.bind(null, o.id)}>
                 <button
                   type="submit"

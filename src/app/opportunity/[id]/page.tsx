@@ -5,6 +5,8 @@ import { getOpportunityById } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/server";
 import { CategoryBadge } from "@/components/category-badge";
 import { UrgencyBadge } from "@/components/urgency-badge";
+import { LiveCountdown } from "@/components/live-countdown";
+import { googleCalendarUrl } from "@/lib/opportunities/calendar";
 import { formatDeadlineFull, hostOf } from "@/lib/opportunities/format";
 import { CATEGORY_LABELS } from "@/lib/supabase/types";
 import { saveOpportunity, unsaveOpportunity } from "@/app/account/actions";
@@ -101,8 +103,31 @@ export default async function OpportunityPage({ params }: PageProps) {
           <div className="font-display text-base font-semibold text-ink">
             {formatDeadlineFull(sel.deadline)}
           </div>
+          <LiveCountdown deadline={sel.deadline} />
           {sel.deadline_note && (
             <div className="mt-1 text-[12.5px] text-ink-4">{sel.deadline_note}</div>
+          )}
+          {sel.deadline && (
+            <div className="mt-2.5 flex flex-wrap gap-1.5">
+              <a
+                href={`/opportunity/${sel.id}/calendar.ics`}
+                data-umami-event="add_to_calendar"
+                data-umami-event-type="ics"
+                className="rounded-md border border-border bg-surface px-2 py-1 text-[11.5px] font-semibold text-ink-3 hover:text-ink-2"
+              >
+                📥 Add to calendar
+              </a>
+              <a
+                href={googleCalendarUrl(sel)}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-umami-event="add_to_calendar"
+                data-umami-event-type="google"
+                className="rounded-md border border-border bg-surface px-2 py-1 text-[11.5px] font-semibold text-ink-3 hover:text-ink-2"
+              >
+                Google Calendar
+              </a>
+            </div>
           )}
         </div>
         <div className="rounded-[13px] border border-border bg-surface p-[15px]">
