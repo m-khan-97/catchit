@@ -136,6 +136,7 @@ export type SavedOpportunity = {
   reminder_48h_sent_at: string | null;
   status: ApplicationStatus;
   status_updated_at: string;
+  note: string;
 };
 
 export type FollowedFilter = {

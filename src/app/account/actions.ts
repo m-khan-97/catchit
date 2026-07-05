@@ -59,6 +59,19 @@ export async function setApplicationStatus(opportunityId: string, status: string
   revalidatePath("/stats");
 }
 
+export async function setSavedNote(opportunityId: string, note: string) {
+  const { supabase, user } = await requireUser();
+
+  const { error } = await supabase
+    .from("saved_opportunities")
+    .update({ note: note.slice(0, 500) })
+    .eq("user_id", user.id)
+    .eq("opportunity_id", opportunityId);
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/account");
+}
+
 export async function followFilter(formData: FormData) {
   const { supabase, user } = await requireUser();
 

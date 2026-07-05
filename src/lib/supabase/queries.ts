@@ -77,6 +77,31 @@ export async function getOpportunityById(id: string): Promise<PublicOpportunity 
   return data;
 }
 
+/**
+ * A handful of other live opportunities in the same category, soonest
+ * deadline first — simple tag-overlap similarity, no ranking model needed
+ * at this corpus size.
+ */
+export async function getSimilarOpportunities(
+  opportunity: Pick<PublicOpportunity, "id" | "category">,
+  limit = 4
+): Promise<PublicOpportunity[]> {
+  const supabase = await createClient();
+  const nowIso = new Date().toISOString();
+
+  const { data, error } = await supabase
+    .from("opportunities_public")
+    .select("*")
+    .eq("category", opportunity.category)
+    .neq("id", opportunity.id)
+    .or(`deadline.is.null,deadline.gte.${nowIso}`)
+    .order("deadline", { ascending: true, nullsFirst: false })
+    .limit(limit);
+
+  if (error) throw error;
+  return data ?? [];
+}
+
 export interface FeedStats {
   total: number;
   live: number;

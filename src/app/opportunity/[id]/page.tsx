@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getOpportunityById } from "@/lib/supabase/queries";
+import { getOpportunityById, getSimilarOpportunities } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/server";
 import { CategoryBadge } from "@/components/category-badge";
 import { UrgencyBadge } from "@/components/urgency-badge";
 import { LiveCountdown } from "@/components/live-countdown";
+import { OpportunityCard } from "@/components/opportunity-card";
 import { googleCalendarUrl } from "@/lib/opportunities/calendar";
 import { formatDeadlineFull, hostOf } from "@/lib/opportunities/format";
 import { CATEGORY_LABELS } from "@/lib/supabase/types";
@@ -56,6 +57,7 @@ export default async function OpportunityPage({ params }: PageProps) {
   }
 
   const region = sel.region_tags.join(", ") || "Region unspecified";
+  const similar = await getSimilarOpportunities(sel);
 
   return (
     <section>
@@ -148,6 +150,19 @@ export default async function OpportunityPage({ params }: PageProps) {
                 <span className="mt-px text-ok">✓</span>
                 {e}
               </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {similar.length > 0 && (
+        <>
+          <h2 className="mb-2.5 font-display text-base font-semibold text-ink">
+            Similar opportunities
+          </h2>
+          <div className="mb-7.5 flex flex-col gap-3">
+            {similar.map((o) => (
+              <OpportunityCard key={o.id} opportunity={o} />
             ))}
           </div>
         </>

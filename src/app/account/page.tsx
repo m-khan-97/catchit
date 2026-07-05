@@ -8,6 +8,7 @@ import { formatDeadlineFull } from "@/lib/opportunities/format";
 import { unsaveOpportunity, unfollowFilter, signOutAccount } from "./actions";
 import { PushToggle } from "./push-toggle";
 import { StatusSelect } from "./status-select";
+import { NoteInput } from "./note-input";
 
 export const metadata: Metadata = { title: "My account" };
 
@@ -52,7 +53,7 @@ export default async function AccountPage() {
       ? await supabase.from("opportunities_public").select("*").in("id", savedIds)
       : { data: [] };
 
-  const statusByOpportunityId = new Map((savedRows ?? []).map((r) => [r.opportunity_id, r.status]));
+  const savedRowByOpportunityId = new Map((savedRows ?? []).map((r) => [r.opportunity_id, r]));
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const calendarUrl = profile ? `${siteUrl}/calendar.ics?token=${profile.calendar_token}` : null;
@@ -125,36 +126,44 @@ export default async function AccountPage() {
         </p>
       ) : (
         <div className="flex flex-col gap-2.5">
-          {savedOpportunities!.map((o) => (
-            <div
-              key={o.id}
-              className="flex items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3.5"
-            >
-              <div className="min-w-0 flex-1">
-                <div className="mb-1.5">
-                  <CategoryBadge category={o.category} />
+          {savedOpportunities!.map((o) => {
+            const savedRow = savedRowByOpportunityId.get(o.id);
+            return (
+              <div
+                key={o.id}
+                className="rounded-xl border border-border bg-surface px-4 py-3.5"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="mb-1.5">
+                      <CategoryBadge category={o.category} />
+                    </div>
+                    <Link
+                      href={`/opportunity/${o.id}`}
+                      className="block truncate font-display text-[15px] font-semibold text-ink hover:text-accent"
+                    >
+                      {o.title}
+                    </Link>
+                    <div className="text-[13px] text-ink-4">
+                      {o.organization} · {formatDeadlineFull(o.deadline)}
+                    </div>
+                  </div>
+                  <StatusSelect opportunityId={o.id} status={savedRow?.status ?? "saved"} />
+                  <form action={unsaveOpportunity.bind(null, o.id)}>
+                    <button
+                      type="submit"
+                      className="rounded-lg border border-border bg-bg px-2.5 py-1.5 text-xs font-semibold text-ink-4 hover:text-danger-ink"
+                    >
+                      Unsave
+                    </button>
+                  </form>
                 </div>
-                <Link
-                  href={`/opportunity/${o.id}`}
-                  className="block truncate font-display text-[15px] font-semibold text-ink hover:text-accent"
-                >
-                  {o.title}
-                </Link>
-                <div className="text-[13px] text-ink-4">
-                  {o.organization} · {formatDeadlineFull(o.deadline)}
+                <div className="mt-2.5">
+                  <NoteInput opportunityId={o.id} note={savedRow?.note ?? ""} />
                 </div>
               </div>
-              <StatusSelect opportunityId={o.id} status={statusByOpportunityId.get(o.id) ?? "saved"} />
-              <form action={unsaveOpportunity.bind(null, o.id)}>
-                <button
-                  type="submit"
-                  className="rounded-lg border border-border bg-bg px-2.5 py-1.5 text-xs font-semibold text-ink-4 hover:text-danger-ink"
-                >
-                  Unsave
-                </button>
-              </form>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </section>
