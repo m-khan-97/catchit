@@ -160,6 +160,25 @@ export type PushSubscriptionRow = {
   created_at: string;
 };
 
+export type StoryStatus = "pending" | "approved" | "rejected";
+
+export type Story = {
+  id: string;
+  name: string;
+  role_line: string;
+  story: string;
+  opportunity_url: string | null;
+  status: StoryStatus;
+  submitted_at: string;
+  reviewed_at: string | null;
+};
+
+/** Columns exposed by the `stories_public` view (approved rows only, no status/review internals). */
+export type PublicStory = Pick<
+  Story,
+  "id" | "name" | "role_line" | "story" | "opportunity_url" | "submitted_at"
+>;
+
 export interface Database {
   public: {
     Tables: {
@@ -222,10 +241,20 @@ export interface Database {
         Update: Partial<PushSubscriptionRow>;
         Relationships: [];
       };
+      stories: {
+        Row: Story;
+        Insert: Partial<Story> & Pick<Story, "name" | "story">;
+        Update: Partial<Story>;
+        Relationships: [];
+      };
     };
     Views: {
       opportunities_public: {
         Row: PublicOpportunity;
+        Relationships: [];
+      };
+      stories_public: {
+        Row: PublicStory;
         Relationships: [];
       };
     };

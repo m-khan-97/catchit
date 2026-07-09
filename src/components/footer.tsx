@@ -13,12 +13,9 @@ export function Footer() {
             Terms
           </Link>
         </div>
-        <a
-          href="mailto:ibrahim.logix@gmail.com?subject=Caught%20something%20thanks%20to%20CatchIt!"
-          className="underline hover:text-ink-2"
-        >
-          Caught something thanks to CatchIt? Tell us.
-        </a>
+        <Link href="/stories" className="underline hover:text-ink-2">
+          Caught something thanks to CatchIt? Tell your story.
+        </Link>
       </div>
     </footer>
   );

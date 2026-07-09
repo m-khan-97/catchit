@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { ReviewQueue } from "./review-queue";
 import { BrokenLinks } from "./broken-links";
+import { StoryQueue } from "./story-queue";
 import { signOut } from "./actions";
 import { findNearDuplicates } from "@/lib/discovery/near-duplicates";
 
@@ -54,6 +55,14 @@ export default async function AdminPage() {
 
   if (brokenLinksError) throw brokenLinksError;
 
+  const { data: pendingStories, error: pendingStoriesError } = await supabase
+    .from("stories")
+    .select("*")
+    .eq("status", "pending")
+    .order("submitted_at", { ascending: false });
+
+  if (pendingStoriesError) throw pendingStoriesError;
+
   // Lightweight scan across pending + approved for "close but not
   // auto-blocked" title matches — see near-duplicates.ts for the exact
   // band. Approved-only titles aren't in `queue`, so fetch them separately.
@@ -91,6 +100,7 @@ export default async function AdminPage() {
       </div>
       <ReviewQueue queue={queue ?? []} nearDuplicates={Object.fromEntries(nearDuplicates)} />
       <BrokenLinks items={brokenLinks ?? []} />
+      <StoryQueue stories={pendingStories ?? []} />
     </section>
   );
 }

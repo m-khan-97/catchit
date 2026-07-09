@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { CatchAnimation } from "@/components/catch-animation";
 
 export const metadata: Metadata = {
@@ -136,6 +137,13 @@ export default function AboutPage() {
             <span className="flex-shrink-0 text-xl">{person.emoji}</span>
           </div>
         ))}
+      </div>
+
+      <div className="mt-7 text-[14.5px] text-ink-3">
+        Did CatchIt catch something for you?{" "}
+        <Link href="/stories" className="font-semibold text-accent hover:text-accent-hover">
+          Tell your story →
+        </Link>
       </div>
     </section>
   );

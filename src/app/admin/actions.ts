@@ -146,6 +146,29 @@ export async function unpublishOpportunity(id: string) {
   revalidatePath("/admin");
 }
 
+export async function approveStory(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("stories")
+    .update({ status: "approved", reviewed_at: new Date().toISOString() })
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin");
+  revalidatePath("/stories");
+}
+
+export async function rejectStory(id: string) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("stories")
+    .update({ status: "rejected", reviewed_at: new Date().toISOString() })
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin");
+}
+
 export async function signOut() {
   const supabase = await createClient();
   await supabase.auth.signOut();
