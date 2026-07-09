@@ -189,6 +189,180 @@
   animation: opp-sweep 3.2s linear infinite;
 }
 
+/* About page "catch" animation — a chip falls, the mitt catches it with a
+   squash-and-stretch wiggle, a ring bursts, a "+1 caught" floats up. Three
+   chips loop on a shared 6s cycle, staggered 2s apart. */
+@keyframes cr-fall {
+  0% {
+    top: -18%;
+    opacity: 0;
+    transform: translateX(-50%) rotate(-7deg) scale(1);
+  }
+  4% {
+    opacity: 1;
+  }
+  8% {
+    transform: translateX(-56%) rotate(6deg) scale(1);
+  }
+  14% {
+    transform: translateX(-45%) rotate(-5deg) scale(1);
+  }
+  19% {
+    top: 52%;
+    transform: translateX(-50%) rotate(2deg) scale(1);
+    opacity: 1;
+  }
+  23% {
+    top: 64%;
+    transform: translateX(-50%) rotate(0deg) scale(0.55, 0.7);
+    opacity: 1;
+  }
+  26% {
+    top: 70%;
+    transform: translateX(-50%) scale(0.15);
+    opacity: 0;
+  }
+  100% {
+    top: -18%;
+    opacity: 0;
+    transform: translateX(-50%) scale(1);
+  }
+}
+
+@keyframes cr-mitt {
+  0%,
+  18% {
+    transform: translateX(-50%) rotate(0) scale(1, 1);
+  }
+  21% {
+    transform: translateX(-50%) rotate(-13deg) scale(1.3, 0.72);
+  }
+  24% {
+    transform: translateX(-50%) rotate(8deg) scale(0.88, 1.14);
+  }
+  27%,
+  51% {
+    transform: translateX(-50%) rotate(0) scale(1, 1);
+  }
+  54% {
+    transform: translateX(-50%) rotate(-13deg) scale(1.3, 0.72);
+  }
+  57% {
+    transform: translateX(-50%) rotate(8deg) scale(0.88, 1.14);
+  }
+  60%,
+  85% {
+    transform: translateX(-50%) rotate(0) scale(1, 1);
+  }
+  88% {
+    transform: translateX(-50%) rotate(-13deg) scale(1.3, 0.72);
+  }
+  91% {
+    transform: translateX(-50%) rotate(8deg) scale(0.88, 1.14);
+  }
+  94%,
+  100% {
+    transform: translateX(-50%) rotate(0) scale(1, 1);
+  }
+}
+
+@keyframes cr-ring {
+  0%,
+  20% {
+    opacity: 0;
+    transform: translateX(-50%) scale(0.2);
+  }
+  23% {
+    opacity: 0.9;
+    transform: translateX(-50%) scale(0.5);
+  }
+  31%,
+  53% {
+    opacity: 0;
+    transform: translateX(-50%) scale(1.7);
+  }
+  56% {
+    opacity: 0.9;
+    transform: translateX(-50%) scale(0.5);
+  }
+  64%,
+  86% {
+    opacity: 0;
+    transform: translateX(-50%) scale(1.7);
+  }
+  89% {
+    opacity: 0.9;
+    transform: translateX(-50%) scale(0.5);
+  }
+  97%,
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) scale(1.7);
+  }
+}
+
+@keyframes cr-plus-one {
+  0%,
+  20% {
+    opacity: 0;
+    transform: translate(-50%, 0) scale(0.5);
+  }
+  23% {
+    opacity: 1;
+    transform: translate(-50%, -10px) scale(1.15);
+  }
+  32% {
+    opacity: 1;
+    transform: translate(-50%, -26px) scale(1);
+  }
+  36%,
+  53% {
+    opacity: 0;
+    transform: translate(-50%, -34px) scale(1);
+  }
+  56% {
+    opacity: 1;
+    transform: translate(-50%, -10px) scale(1.15);
+  }
+  65% {
+    opacity: 1;
+    transform: translate(-50%, -26px) scale(1);
+  }
+  69%,
+  86% {
+    opacity: 0;
+    transform: translate(-50%, -34px) scale(1);
+  }
+  89% {
+    opacity: 1;
+    transform: translate(-50%, -10px) scale(1.15);
+  }
+  98% {
+    opacity: 1;
+    transform: translate(-50%, -26px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -34px) scale(1);
+  }
+}
+
+.animate-cr-fall {
+  animation: cr-fall 6s ease-in infinite;
+}
+
+.animate-cr-mitt {
+  animation: cr-mitt 6s ease-in-out infinite;
+}
+
+.animate-cr-ring {
+  animation: cr-ring 6s ease-out infinite;
+}
+
+.animate-cr-plus-one {
+  animation: cr-plus-one 6s ease-out infinite;
+}
+
 * {
   box-sizing: border-box;
 }
