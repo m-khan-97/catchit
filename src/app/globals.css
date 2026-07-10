@@ -363,6 +363,23 @@
   animation: cr-plus-one 6s ease-out infinite;
 }
 
+/* Story wall: a one-shot fade-in on mount, staggered per-card via an
+   inline animation-delay. Opacity only — the per-card tilt and hover lift
+   are handled separately via Tailwind transform utilities, so the two
+   never fight over the same CSS property. */
+@keyframes card-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-card-fade-in {
+  animation: card-fade-in 0.45s ease-out both;
+}
+
 * {
   box-sizing: border-box;
 }
