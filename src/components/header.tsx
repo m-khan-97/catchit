@@ -10,6 +10,7 @@ import { ThemeToggle } from "./theme-toggle";
 const NAV = [
   { href: "/", label: "Feed" },
   { href: "/submit", label: "Submit" },
+  { href: "/stories", label: "Stories" },
   { href: "/stats", label: "Stats" },
   { href: "/about", label: "About" },
 ];
@@ -26,7 +27,7 @@ export function Header({ signedIn }: { signedIn: boolean }) {
             CatchIt
           </span>
         </Link>
-        <nav className="ml-auto flex items-center gap-0.5">
+        <nav className="ml-auto flex min-w-0 items-center gap-0.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {NAV.map((n) => {
             const active = n.href === "/" ? pathname === "/" : pathname.startsWith(n.href);
             return (
@@ -35,8 +36,8 @@ export function Header({ signedIn }: { signedIn: boolean }) {
                 href={n.href}
                 className={
                   active
-                    ? "rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-accent-ink"
-                    : "rounded-lg px-3 py-1.5 text-sm font-semibold text-ink-4 hover:text-ink-2"
+                    ? "flex-shrink-0 rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold whitespace-nowrap text-accent-ink"
+                    : "flex-shrink-0 rounded-lg px-3 py-1.5 text-sm font-semibold whitespace-nowrap text-ink-4 hover:text-ink-2"
                 }
               >
                 {n.label}
@@ -47,13 +48,15 @@ export function Header({ signedIn }: { signedIn: boolean }) {
             href={signedIn ? "/account" : "/login"}
             className={
               pathname.startsWith("/account") || pathname === "/login"
-                ? "rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold text-accent-ink"
-                : "rounded-lg px-3 py-1.5 text-sm font-semibold text-ink-4 hover:text-ink-2"
+                ? "flex-shrink-0 rounded-lg bg-accent px-3 py-1.5 text-sm font-semibold whitespace-nowrap text-accent-ink"
+                : "flex-shrink-0 rounded-lg px-3 py-1.5 text-sm font-semibold whitespace-nowrap text-ink-4 hover:text-ink-2"
             }
           >
             {signedIn ? "Account" : "Sign in"}
           </Link>
-          <ThemeToggle />
+          <span className="flex-shrink-0">
+            <ThemeToggle />
+          </span>
         </nav>
       </div>
     </header>
