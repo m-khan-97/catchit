@@ -13,6 +13,7 @@ import { CategoryBadge } from "@/components/category-badge";
 import { formatDeadlineFull } from "@/lib/opportunities/format";
 import { unsaveOpportunity, unfollowFilter, signOutAccount, setPreferences } from "./actions";
 import { PushToggle } from "./push-toggle";
+import { InstallPrompt } from "@/components/install-prompt";
 import { StatusSelect } from "./status-select";
 import { NoteInput } from "./note-input";
 
@@ -97,6 +98,7 @@ export default async function AccountPage() {
         </div>
       )}
 
+      <InstallPrompt />
       <PushToggle />
 
       <div className="mb-7 rounded-2xl border border-border bg-surface px-5 py-4">

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Instrument_Sans } from "next/font/google";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
@@ -27,6 +27,16 @@ export const metadata: Metadata = {
   },
   description:
     "Hackathons, free credits, scholarships, and conference & journal CFPs — surfaced while there's still time to act.",
+  appleWebApp: {
+    title: "CatchIt",
+    statusBarStyle: "black-translucent",
+  },
+};
+
+// Matches manifest.ts's theme_color — dark is the default theme, and this
+// tag isn't wired to the light/dark toggle (it only reads once at load).
+export const viewport: Viewport = {
+  themeColor: "#0F100C",
 };
 
 // Runs before paint so the saved theme applies with no flash of the wrong
