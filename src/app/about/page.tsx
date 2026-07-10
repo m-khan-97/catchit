@@ -88,7 +88,7 @@ export default function AboutPage() {
       </div>
 
       <div className="mb-7.5 rounded-2xl bg-panel p-6">
-        <div className="font-display text-[22px] leading-[1.28] font-bold tracking-[-0.015em] text-ink">
+        <div className="font-display text-[22px] leading-[1.28] font-bold tracking-[-0.015em] text-[#EDECE2]">
           One place that catches it <span className="text-accent">before it&apos;s gone</span> —
           so you stop finding out a day too late.
         </div>
