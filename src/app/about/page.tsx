@@ -121,7 +121,7 @@ export default function AboutPage() {
 
       <div className="mt-7 text-[14.5px] text-ink-3">
         Did CatchIt catch something for you?{" "}
-        <Link href="/stories" className="font-semibold text-accent hover:text-accent-hover">
+        <Link href="/stories" className="font-semibold text-ink underline hover:text-ink-2">
           Tell your story →
         </Link>
       </div>

@@ -63,7 +63,7 @@ export default async function StoriesPage() {
                   href={s.opportunity_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-2 inline-block text-[13px] font-semibold text-accent hover:text-accent-hover"
+                  className="mt-2 inline-block text-[13px] font-semibold text-ink underline hover:text-ink-2"
                 >
                   What they caught ↗
                 </a>
