@@ -6,6 +6,11 @@ export const metadata: Metadata = {
   description: "A quick, honest snapshot of what's flowed through CatchIt so far.",
 };
 
+// Public, read-only Umami share link — anyone can inspect the live traffic
+// numbers without an account. Deliberately public: honest numbers are the
+// product's credibility (roadmap §2c).
+const PUBLIC_ANALYTICS_URL = "https://cloud.umami.is/analytics/eu/share/MZb7FnR2fWBAPvLJ";
+
 export default async function StatsPage() {
   const stats = await getStats();
 
@@ -36,6 +41,18 @@ export default async function StatsPage() {
           </div>
         ))}
       </div>
+
+      <p className="mt-6 text-[14px] text-ink-3">
+        Don&apos;t take our word for it —{" "}
+        <a
+          href={PUBLIC_ANALYTICS_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-semibold text-ink underline hover:text-ink-2"
+        >
+          the live traffic dashboard is public ↗
+        </a>
+      </p>
     </section>
   );
 }
