@@ -43,14 +43,15 @@ export default async function StatsPage() {
       </div>
 
       <p className="mt-6 text-[14px] text-ink-3">
-        Don&apos;t take our word for it —{" "}
+        The numbers above are what&apos;s flowed through the radar. Curious how many people
+        actually visit?{" "}
         <a
           href={PUBLIC_ANALYTICS_URL}
           target="_blank"
           rel="noopener noreferrer"
           className="font-semibold text-ink underline hover:text-ink-2"
         >
-          the live traffic dashboard is public ↗
+          Our live traffic dashboard is public ↗
         </a>
       </p>
     </section>
