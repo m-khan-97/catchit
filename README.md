@@ -4,6 +4,8 @@
 
 CatchIt automatically discovers and publishes career-relevant opportunities for students, researchers, and early-career professionals — hackathons, scholarships, internships, free software/cloud credits, tech events, and conference & journal CFPs — so people stop missing deadlines they'd otherwise never hear about.
 
+**Live at [catchit.aureonsystemsltd.com](https://catchit.aureonsystemsltd.com)** — an [Aureon Systems](https://aureonsystemsltd.com) product.
+
 Built by [Muhammad Ibrahim](https://github.com/m-khan-97), Vishnu Ajith, and Muhammed Sihan Haroon.
 
 <p>
@@ -21,7 +23,7 @@ Built by [Muhammad Ibrahim](https://github.com/m-khan-97), Vishnu Ajith, and Muh
 
 ## Project status
 
-**Live in production**, discovering and serving real opportunities. Full build plan: [`catchit-build-plan.md`](catchit-build-plan.md).
+**Live in production** at [catchit.aureonsystemsltd.com](https://catchit.aureonsystemsltd.com), discovering and serving real opportunities. Full build plan: [`catchit-build-plan.md`](catchit-build-plan.md).
 
 - [x] **Milestone 1** — Scaffold, design system, database schema, Supabase auth plumbing
 - [x] **Milestone 2** — Public site: feed, filters, search, detail pages, calendar export, submission form, stats, about page, SEO
