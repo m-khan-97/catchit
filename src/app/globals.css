@@ -59,6 +59,10 @@
   --color-cat-journal-bg: rgba(201, 162, 39, 0.18);
   --color-cat-journal-fg: #e3c86a;
 
+  --color-cat-startup-dot: #e0399e;
+  --color-cat-startup-bg: rgba(224, 57, 158, 0.17);
+  --color-cat-startup-fg: #f0a0d4;
+
   --color-cat-other-dot: #8a8a7e;
   --color-cat-other-bg: rgba(138, 138, 126, 0.2);
   --color-cat-other-fg: #b8b7a9;
@@ -100,6 +104,8 @@
   --color-cat-conference-fg: #0e6b65;
   --color-cat-journal-bg: #f7f0d8;
   --color-cat-journal-fg: #8a6d0b;
+  --color-cat-startup-bg: #fce4f3;
+  --color-cat-startup-fg: #a3216f;
   --color-cat-other-bg: #eaeae3;
   --color-cat-other-fg: #55554c;
 }
@@ -152,6 +158,9 @@
   --color-cat-journal-dot: var(--color-cat-journal-dot);
   --color-cat-journal-bg: var(--color-cat-journal-bg);
   --color-cat-journal-fg: var(--color-cat-journal-fg);
+  --color-cat-startup-dot: var(--color-cat-startup-dot);
+  --color-cat-startup-bg: var(--color-cat-startup-bg);
+  --color-cat-startup-fg: var(--color-cat-startup-fg);
   --color-cat-other-dot: var(--color-cat-other-dot);
   --color-cat-other-bg: var(--color-cat-other-bg);
   --color-cat-other-fg: var(--color-cat-other-fg);

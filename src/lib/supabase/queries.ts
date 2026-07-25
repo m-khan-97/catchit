@@ -1,17 +1,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { sanitizeSearchTerm } from "@/lib/opportunities/search";
-import type { OpportunityCategory, PublicOpportunity } from "./types";
+import { CATEGORIES, type OpportunityCategory, type PublicOpportunity } from "./types";
 
-const CATEGORY_VALUES = new Set<string>([
-  "hackathon",
-  "voucher",
-  "event",
-  "scholarship",
-  "internship",
-  "conference",
-  "journal",
-  "other",
-]);
+// Derived from the shared CATEGORIES constant rather than hand-duplicated —
+// a previous hardcoded copy of this list silently ignored ?category=
+// filters for any category added afterward, since the .eq() below only
+// runs when the value passes this check.
+const CATEGORY_VALUES = new Set<string>(CATEGORIES);
 
 export interface FeedFilters {
   category?: string;

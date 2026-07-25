@@ -9,14 +9,15 @@ function currentMonthYear(): string {
   return `${d.toLocaleString("en-US", { month: "long" })} ${d.getFullYear()}`;
 }
 
-// Vouchers, journal special issues, scholarships, and conference CFPs barely
-// change day to day (a new student discount or CFP doesn't appear and vanish
-// within 24h the way a hackathon registration deadline can), so restricting
-// them to 2 fixed days a week loses almost no real freshness while cutting
-// their AI-search query volume by roughly 5/7 — the bulk of the daily bill.
-// Only `event` and `internship` (genuinely time-sensitive — registration
-// windows that can close with little notice) stay on daily cadence.
-const LOW_CHURN_CATEGORIES = new Set(["voucher", "journal", "scholarship", "conference"]);
+// Vouchers, journal special issues, scholarships, conference CFPs, and
+// startup/grant opportunities barely change day to day (a new student
+// discount, CFP, or accelerator cohort doesn't appear and vanish within 24h
+// the way a hackathon registration deadline can), so restricting them to 2
+// fixed days a week loses almost no real freshness while cutting their
+// AI-search query volume by roughly 5/7 — the bulk of the daily bill. Only
+// `event` and `internship` (genuinely time-sensitive — registration windows
+// that can close with little notice) stay on daily cadence.
+const LOW_CHURN_CATEGORIES = new Set(["voucher", "journal", "scholarship", "conference", "startup"]);
 // Monday and Thursday (UTC) — spread across the week, cron-independent.
 const LOW_CHURN_DAYS_UTC = new Set([1, 4]);
 
@@ -55,13 +56,19 @@ export const QUERY_POOLS: Record<string, string[]> = {
   conference: [
     `international conference machine learning ${currentYear()} call for papers deadline`,
     `IEEE OR ACM conference ${currentYear()} paper submission deadline`,
-    `student hackathon UK OR remote ${currentMonthYear()}`,
+    `computer science conference call for papers deadline ${currentYear()}`,
     "call for papers tech conference deadline student speakers",
   ],
   journal: [
     `journal special issue call for papers computer science ${currentMonthYear()}`,
     `Springer OR Elsevier OR MDPI special issue deadline ${currentYear()}`,
     `PhD funding OR research fellowship computer science deadline ${currentYear()}`,
+  ],
+  startup: [
+    `student startup pitch competition ${currentYear()} apply deadline`,
+    `startup accelerator OR incubator program applications open ${currentYear()}`,
+    `innovation grant OR enterprise grant students UK deadline ${currentYear()}`,
+    `business plan competition students UK OR global deadline ${currentYear()}`,
   ],
 };
 

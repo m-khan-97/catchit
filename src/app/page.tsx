@@ -98,7 +98,7 @@ export default async function Home({
           </span>
         </h1>
         <p className="max-w-[47ch] text-base leading-relaxed text-ink-3">
-          Hackathons, free credits, scholarships, and conference &amp; journal CFPs — surfaced
+          Hackathons, free credits, scholarships, startup grants, and conference & journal CFPs — surfaced
           while there&apos;s still time to act, so you never find out a day too late.
         </p>
       </div>

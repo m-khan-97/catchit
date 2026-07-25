@@ -11,6 +11,7 @@ export type OpportunityCategory =
   | "internship"
   | "conference"
   | "journal"
+  | "startup"
   | "other";
 
 export type OpportunityStatus = "pending" | "approved" | "rejected";
@@ -273,6 +274,7 @@ export const CATEGORIES = [
   "internship",
   "conference",
   "journal",
+  "startup",
   "other",
 ] as const satisfies readonly OpportunityCategory[];
 
@@ -284,6 +286,7 @@ export const CATEGORY_LABELS: Record<OpportunityCategory, string> = {
   internship: "Internship",
   conference: "Conference CFP",
   journal: "Journal CFP",
+  startup: "Startup & Grants",
   other: "Other",
 };
 

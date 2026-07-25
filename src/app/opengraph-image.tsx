@@ -60,7 +60,7 @@ export default function Image() {
           Catch it before it&apos;s gone.
         </div>
         <div style={{ fontSize: 30, color: "#9C9A8A", marginTop: 28, maxWidth: 900, display: "flex" }}>
-          Hackathons, free credits, scholarships, and conference &amp; journal CFPs — surfaced
+          Hackathons, free credits, scholarships, startup grants, and conference & journal CFPs — surfaced
           while there&apos;s still time to act.
         </div>
       </div>
