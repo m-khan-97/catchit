@@ -1,14 +1,18 @@
 import "server-only";
 import type { Candidate } from "./schema";
 
+// Devpost's API omits fields on some listings rather than sending empty
+// strings — an invite-only corporate hackathon was observed with a null
+// `displayed_location.location`. These optionals are load-bearing: the
+// previous non-null types let a null slip through to `.trim()` at runtime.
 interface DevpostHackathon {
   title: string;
   organization_name: string;
   url: string;
-  displayed_location: { location: string };
+  displayed_location: { location: string | null } | null;
   submission_period_dates: string;
-  themes: { id: number; name: string }[];
-  prize_amount: string;
+  themes: { id: number; name: string }[] | null;
+  prize_amount: string | null;
   invite_only: boolean;
 }
 
@@ -17,8 +21,17 @@ const MONTHS: Record<string, number> = {
   jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11,
 };
 
-function stripHtml(s: string): string {
-  return s.replace(/<[^>]*>/g, "").trim();
+function stripHtml(s: string | null): string {
+  return s ? s.replace(/<[^>]*>/g, "").trim() : "";
+}
+
+/** Empty string when Devpost gives us no location — callers pick the wording. */
+function locationOf(h: DevpostHackathon): string {
+  return h.displayed_location?.location?.trim() ?? "";
+}
+
+function themeNames(h: DevpostHackathon): string[] {
+  return (h.themes ?? []).map((t) => t.name).filter(Boolean);
 }
 
 /**
@@ -55,22 +68,30 @@ function regionTagsFor(location: string): string[] {
   return [];
 }
 
+// A missing location means Devpost didn't tell us, which is not the same as
+// "Online" — the record that exposed this bug is an in-person NYC hackathon.
+// Say nothing rather than assert a venue we don't have.
 function buildSnippet(h: DevpostHackathon): string {
   const prize = stripHtml(h.prize_amount);
-  const themes = h.themes.slice(0, 3).map((t) => t.name).join(", ");
+  const themes = themeNames(h).slice(0, 3).join(", ");
+  const location = locationOf(h);
   const parts: string[] = [];
   if (prize && prize !== "$0") parts.push(`${prize} in prizes`);
   if (themes) parts.push(themes);
-  parts.push(h.displayed_location.location.trim() || "Online");
+  if (location) parts.push(location);
+  // schema.ts requires a non-empty snippet — without this floor a listing
+  // with no prize, themes or location would be dropped at validation.
+  if (parts.length === 0) return `Hackathon hosted by ${h.organization_name}`;
   return parts.join(" · ");
 }
 
 function buildDescription(h: DevpostHackathon): string {
-  const themes = h.themes.map((t) => t.name).join(", ");
+  const themes = themeNames(h).join(", ");
+  const location = locationOf(h);
   return `${h.title} is a hackathon hosted by ${h.organization_name}${
     themes ? `, focused on ${themes}` : ""
-  }. Submissions run ${h.submission_period_dates}, hosted ${
-    h.displayed_location.location.trim() || "online"
+  }. Submissions run ${h.submission_period_dates}${
+    location ? `, hosted ${location}` : ""
   }.`;
 }
 
@@ -98,30 +119,36 @@ export async function fetchDevpostCandidates(): Promise<{
   let discarded = 0;
 
   for (const h of all) {
-    const deadline = parseDevpostDeadline(h.submission_period_dates);
-    if (deadline && deadline.getTime() <= Date.now()) {
+    // Per-listing guard: a single malformed record used to throw out of the
+    // loop and cost us every Devpost hackathon in the run, not just itself.
+    try {
+      const deadline = parseDevpostDeadline(h.submission_period_dates);
+      if (deadline && deadline.getTime() <= Date.now()) {
+        discarded++;
+        continue;
+      }
+      if (!h.url || !h.title || !h.organization_name) {
+        discarded++;
+        continue;
+      }
+      candidates.push({
+        title: h.title.trim(),
+        organization: h.organization_name.trim(),
+        category: "hackathon",
+        snippet: buildSnippet(h),
+        description: buildDescription(h),
+        eligibility: h.invite_only
+          ? ["Invite-only — check the hackathon page for how to get an invite"]
+          : [],
+        url: h.url,
+        deadline: deadline ? deadline.toISOString() : null,
+        deadline_note: null,
+        region_tags: regionTagsFor(locationOf(h)),
+        audience_tags: ["students", "professionals"],
+      });
+    } catch {
       discarded++;
-      continue;
     }
-    if (!h.url || !h.title || !h.organization_name) {
-      discarded++;
-      continue;
-    }
-    candidates.push({
-      title: h.title.trim(),
-      organization: h.organization_name.trim(),
-      category: "hackathon",
-      snippet: buildSnippet(h),
-      description: buildDescription(h),
-      eligibility: h.invite_only
-        ? ["Invite-only — check the hackathon page for how to get an invite"]
-        : [],
-      url: h.url,
-      deadline: deadline ? deadline.toISOString() : null,
-      deadline_note: null,
-      region_tags: regionTagsFor(h.displayed_location.location),
-      audience_tags: ["students", "professionals"],
-    });
   }
 
   return { candidates, discarded };
