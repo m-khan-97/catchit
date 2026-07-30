@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "CatchIt — catch it before it's gone",
     short_name: "CatchIt",
     description:
-      "Hackathons, free credits, scholarships, startup grants, and conference & journal CFPs — surfaced while there's still time to act.",
+      "Hackathons, free credits, scholarships, funded PhDs, startup grants, and conference & journal CFPs — surfaced while there's still time to act.",
     start_url: "/",
     id: "/",
     scope: "/",

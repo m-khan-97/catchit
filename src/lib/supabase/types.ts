@@ -12,6 +12,7 @@ export type OpportunityCategory =
   | "conference"
   | "journal"
   | "startup"
+  | "academic"
   | "other";
 
 export type OpportunityStatus = "pending" | "approved" | "rejected";
@@ -275,6 +276,7 @@ export const CATEGORIES = [
   "conference",
   "journal",
   "startup",
+  "academic",
   "other",
 ] as const satisfies readonly OpportunityCategory[];
 
@@ -287,6 +289,7 @@ export const CATEGORY_LABELS: Record<OpportunityCategory, string> = {
   conference: "Conference CFP",
   journal: "Journal CFP",
   startup: "Startup & Grants",
+  academic: "PhD & Research Posts",
   other: "Other",
 };
 

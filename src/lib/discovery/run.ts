@@ -42,7 +42,11 @@ interface CandidateEntry {
   candidate: Candidate;
 }
 
-const AI_SEARCH_CATEGORIES = [
+// Categories AI web search covers. Not derived from CATEGORIES: `hackathon`
+// has dedicated scrapers and `other` is a manual-submission fallback, so
+// neither belongs here. Adding a category to CATEGORIES without adding it
+// here silently excludes it from discovery — check both.
+export const AI_SEARCH_CATEGORIES = [
   "voucher",
   "event",
   "scholarship",
@@ -50,6 +54,7 @@ const AI_SEARCH_CATEGORIES = [
   "conference",
   "journal",
   "startup",
+  "academic",
 ] as const;
 const QUERIES_PER_CATEGORY = 4;
 // Batches guarantee results within 24h; treat anything older as stuck rather
@@ -120,6 +125,16 @@ async function validateDedupInsert(
   return { inserted, skipped, failedInserts, errorNotes };
 }
 
+export interface DiscoveryOptions {
+  /**
+   * Restrict AI web search to these categories and ignore the low-churn day
+   * gate. For backfilling a category that was just added, without waiting for
+   * its next scheduled slot — and without paying for every other category on
+   * the way. Scheduled runs omit this and use the normal cadence.
+   */
+  onlyCategories?: readonly string[];
+}
+
 /**
  * Runs Devpost + WikiCFP synchronously (structured, free, fast) and inserts
  * their survivors immediately. AI-search queries are submitted as a single
@@ -127,7 +142,9 @@ async function validateDedupInsert(
  * results are picked up later by `collectDiscoveryBatches`, called from a
  * separate cron a couple of hours after this one.
  */
-export async function runDiscovery(): Promise<DiscoveryRunSummary> {
+export async function runDiscovery(
+  options: DiscoveryOptions = {}
+): Promise<DiscoveryRunSummary> {
   const supabase = createAdminClient();
 
   const { data: runRow, error: runInsertError } = await supabase
@@ -195,10 +212,12 @@ export async function runDiscovery(): Promise<DiscoveryRunSummary> {
 
     // 3. AI web-search — supplements every category; primary for vouchers,
     // events, scholarships, internships, and journals. Low-churn categories
-    // (see shouldRunCategoryToday) only run 2 days a week.
+    // (see shouldRunCategoryToday) only run 2 days a week, unless the caller
+    // named an explicit set to backfill.
+    const only = options.onlyCategories;
     const tasks: BatchTask[] = [];
     for (const category of AI_SEARCH_CATEGORIES) {
-      if (!shouldRunCategoryToday(category)) continue;
+      if (only ? !only.includes(category) : !shouldRunCategoryToday(category)) continue;
       const pool = QUERY_POOLS[category] ?? [];
       for (const query of pickQueriesForToday(pool, QUERIES_PER_CATEGORY)) {
         tasks.push({ category, query });

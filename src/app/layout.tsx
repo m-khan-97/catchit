@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     template: "%s · CatchIt",
   },
   description:
-    "Hackathons, free credits, scholarships, startup grants, and conference & journal CFPs — surfaced while there's still time to act.",
+    "Hackathons, free credits, scholarships, funded PhDs, startup grants, and conference & journal CFPs — surfaced while there's still time to act.",
   appleWebApp: {
     title: "CatchIt",
     statusBarStyle: "black-translucent",
