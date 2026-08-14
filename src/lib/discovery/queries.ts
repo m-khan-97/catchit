@@ -9,6 +9,18 @@ function currentMonthYear(): string {
   return `${d.toLocaleString("en-US", { month: "long" })} ${d.getFullYear()}`;
 }
 
+/**
+ * The intake year graduate schemes are currently recruiting for. They run
+ * roughly a year ahead: applications opening in the autumn are for the
+ * following September's cohort. So from August onward, searching the
+ * current year finds intakes that have already closed — which is exactly
+ * how the first version of the graduate pool ended up near-empty.
+ */
+function graduateIntakeYear(): number {
+  const d = new Date();
+  return d.getUTCMonth() >= 7 ? d.getUTCFullYear() + 1 : d.getUTCFullYear();
+}
+
 // Vouchers, journal special issues, scholarships, conference CFPs,
 // startup/grant opportunities, and academic posts barely change day to day
 // (a new student discount, CFP, accelerator cohort, or funded studentship
@@ -90,13 +102,14 @@ export const QUERY_POOLS: Record<string, string[]> = {
     `postdoctoral research position OR postdoc vacancy ${currentYear()} deadline`,
     `research fellowship early career researcher ${currentYear()} call for applications`,
   ],
-  // Graduate schemes recruit roughly a year ahead — applications that open
-  // now are typically for next autumn's intake — so one query deliberately
-  // targets the next intake year rather than the current one.
+  // Most of these track the intake being recruited for (see
+  // graduateIntakeYear), not the calendar year. The last one deliberately
+  // stays on the current year to catch immediate-start graduate roles,
+  // which are advertised like ordinary vacancies rather than by cohort.
   graduate: [
-    `graduate scheme ${currentYear()} applications open closing date UK`,
-    `graduate programme ${currentYear() + 1} intake apply deadline`,
-    `technology OR engineering graduate scheme UK ${currentYear()} deadline`,
+    `graduate scheme ${graduateIntakeYear()} applications open closing date UK`,
+    `graduate programme ${graduateIntakeYear()} intake apply deadline`,
+    `technology OR engineering graduate scheme UK ${graduateIntakeYear()} deadline`,
     `graduate job OR graduate role apply deadline ${currentYear()}`,
   ],
 };
