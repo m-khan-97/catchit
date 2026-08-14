@@ -13,6 +13,8 @@ interface FilterChipsProps {
   active: string;
   currentParams: URLSearchParams;
   activeDotClass?: string;
+  /** Path the chips link to. Defaults to the public feed. */
+  basePath?: string;
 }
 
 /**
@@ -25,6 +27,7 @@ export function FilterChips({
   active,
   currentParams,
   activeDotClass,
+  basePath = "/",
 }: FilterChipsProps) {
   return (
     <>
@@ -37,7 +40,7 @@ export function FilterChips({
           params.set(paramKey, opt.value);
         }
         const qs = params.toString();
-        const href = qs ? `/?${qs}` : "/";
+        const href = qs ? `${basePath}?${qs}` : basePath;
 
         return (
           <Link

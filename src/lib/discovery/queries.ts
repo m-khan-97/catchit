@@ -26,6 +26,7 @@ const LOW_CHURN_CATEGORIES = new Set([
   "conference",
   "startup",
   "academic",
+  "graduate",
 ]);
 // Monday and Thursday (UTC) — spread across the week, cron-independent.
 const LOW_CHURN_DAYS_UTC = new Set([1, 4]);
@@ -88,6 +89,15 @@ export const QUERY_POOLS: Record<string, string[]> = {
     `funded PhD position open to international students ${currentYear()}`,
     `postdoctoral research position OR postdoc vacancy ${currentYear()} deadline`,
     `research fellowship early career researcher ${currentYear()} call for applications`,
+  ],
+  // Graduate schemes recruit roughly a year ahead — applications that open
+  // now are typically for next autumn's intake — so one query deliberately
+  // targets the next intake year rather than the current one.
+  graduate: [
+    `graduate scheme ${currentYear()} applications open closing date UK`,
+    `graduate programme ${currentYear() + 1} intake apply deadline`,
+    `technology OR engineering graduate scheme UK ${currentYear()} deadline`,
+    `graduate job OR graduate role apply deadline ${currentYear()}`,
   ],
 };
 

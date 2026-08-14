@@ -67,6 +67,10 @@
   --color-cat-academic-bg: rgba(212, 87, 78, 0.17);
   --color-cat-academic-fg: #f0a89f;
 
+  --color-cat-graduate-dot: #be68d3;
+  --color-cat-graduate-bg: rgba(190, 104, 211, 0.17);
+  --color-cat-graduate-fg: #e2b3ee;
+
   --color-cat-other-dot: #8a8a7e;
   --color-cat-other-bg: rgba(138, 138, 126, 0.2);
   --color-cat-other-fg: #b8b7a9;
@@ -112,6 +116,8 @@
   --color-cat-startup-fg: #a3216f;
   --color-cat-academic-bg: #fbe5e3;
   --color-cat-academic-fg: #a5352c;
+  --color-cat-graduate-bg: #f7e8fb;
+  --color-cat-graduate-fg: #7d2a92;
   --color-cat-other-bg: #eaeae3;
   --color-cat-other-fg: #55554c;
 }
@@ -170,6 +176,9 @@
   --color-cat-academic-dot: var(--color-cat-academic-dot);
   --color-cat-academic-bg: var(--color-cat-academic-bg);
   --color-cat-academic-fg: var(--color-cat-academic-fg);
+  --color-cat-graduate-dot: var(--color-cat-graduate-dot);
+  --color-cat-graduate-bg: var(--color-cat-graduate-bg);
+  --color-cat-graduate-fg: var(--color-cat-graduate-fg);
   --color-cat-other-dot: var(--color-cat-other-dot);
   --color-cat-other-bg: var(--color-cat-other-bg);
   --color-cat-other-fg: var(--color-cat-other-fg);

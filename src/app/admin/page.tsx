@@ -5,10 +5,33 @@ import { BrokenLinks } from "./broken-links";
 import { StoryQueue } from "./story-queue";
 import { signOut } from "./actions";
 import { findNearDuplicates } from "@/lib/discovery/near-duplicates";
+import { CATEGORIES, CATEGORY_LABELS, type OpportunityCategory } from "@/lib/supabase/types";
+import { CATEGORY_STYLES } from "@/lib/opportunities/styles";
+import { FilterChips, type ChipOption } from "@/components/filter-chips";
 
 export const metadata: Metadata = { title: "Review queue" };
 
-export default async function AdminPage() {
+type SearchParams = { [key: string]: string | string[] | undefined };
+
+function first(value: string | string[] | undefined): string {
+  return Array.isArray(value) ? (value[0] ?? "") : (value ?? "");
+}
+
+function isCategory(value: string): value is OpportunityCategory {
+  return (CATEGORIES as readonly string[]).includes(value);
+}
+
+export default async function AdminPage({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) {
+  const sp = await searchParams;
+  const rawCategory = first(sp.category);
+  // Ignore an unknown ?category= rather than showing an empty queue that
+  // looks like "nothing to review".
+  const category: OpportunityCategory | "all" = isCategory(rawCategory) ? rawCategory : "all";
+
   const supabase = await createClient();
 
   const { data: isAdminData } = await supabase.rpc("is_admin");
@@ -38,11 +61,28 @@ export default async function AdminPage() {
     );
   }
 
-  const { data: queue, error } = await supabase
+  // Category counts come from every pending row (one column, so cheap) so
+  // the chips still show the full picture while a filter is applied.
+  const { data: pendingCategories, error: countsError } = await supabase
+    .from("opportunities")
+    .select("category")
+    .eq("status", "pending");
+  if (countsError) throw countsError;
+
+  const countByCategory = new Map<string, number>();
+  for (const row of pendingCategories ?? []) {
+    countByCategory.set(row.category, (countByCategory.get(row.category) ?? 0) + 1);
+  }
+  const totalPending = pendingCategories?.length ?? 0;
+
+  let queueQuery = supabase
     .from("opportunities")
     .select("*")
     .eq("status", "pending")
     .order("discovered_at", { ascending: false });
+  if (category !== "all") queueQuery = queueQuery.eq("category", category);
+
+  const { data: queue, error } = await queueQuery;
 
   if (error) throw error;
 
@@ -63,13 +103,19 @@ export default async function AdminPage() {
 
   if (pendingStoriesError) throw pendingStoriesError;
 
-  // Lightweight scan across pending + approved for "close but not
-  // auto-blocked" title matches — see near-duplicates.ts for the exact
-  // band. Approved-only titles aren't in `queue`, so fetch them separately.
-  const { data: approvedTitles, error: approvedTitlesError } = await supabase
+  // Scan across pending + approved for "close but not auto-blocked" title
+  // matches — see near-duplicates.ts for the exact band. Approved-only
+  // titles aren't in `queue`, so fetch them separately. Matching is
+  // within-category, so a filtered view only needs that category's titles —
+  // which is what keeps this affordable once the queue grows: the scan is
+  // quadratic in the number of titles it's given.
+  let approvedQuery = supabase
     .from("opportunities")
     .select("id,title,category,status")
     .eq("status", "approved");
+  if (category !== "all") approvedQuery = approvedQuery.eq("category", category);
+
+  const { data: approvedTitles, error: approvedTitlesError } = await approvedQuery;
   if (approvedTitlesError) throw approvedTitlesError;
 
   const nearDuplicates = findNearDuplicates([
@@ -79,14 +125,36 @@ export default async function AdminPage() {
 
   const pendingCount = queue?.length ?? 0;
 
+  const currentParams = new URLSearchParams();
+  if (category !== "all") currentParams.set("category", category);
+
+  // Only offer categories that actually have something waiting — chips for
+  // empty categories are noise on a queue this size.
+  const categoryOptions: ChipOption[] = [
+    { value: "all", label: `All (${totalPending})` },
+    ...CATEGORIES.filter((c) => (countByCategory.get(c) ?? 0) > 0).map((c) => ({
+      value: c,
+      label: `${CATEGORY_LABELS[c]} (${countByCategory.get(c)})`,
+      dotClass: CATEGORY_STYLES[c].dot,
+    })),
+  ];
+
   return (
     <section>
       <div className="mb-5 flex items-center justify-between gap-4">
         <div>
           <h1 className="font-display text-2xl font-bold tracking-[-0.02em] text-ink">Review queue</h1>
           <p className="mt-1 text-[14.5px] text-ink-3">
-            {pendingCount} item{pendingCount === 1 ? "" : "s"} waiting on you · students never see
-            this page
+            {category === "all" ? (
+              <>
+                {pendingCount} item{pendingCount === 1 ? "" : "s"} waiting on you
+              </>
+            ) : (
+              <>
+                {pendingCount} of {totalPending} · {CATEGORY_LABELS[category]}
+              </>
+            )}{" "}
+            · students never see this page
           </p>
         </div>
         <form action={signOut}>
@@ -98,6 +166,17 @@ export default async function AdminPage() {
           </button>
         </form>
       </div>
+      {categoryOptions.length > 1 && (
+        <div className="mb-5 flex flex-wrap items-center gap-2">
+          <FilterChips
+            paramKey="category"
+            options={categoryOptions}
+            active={category}
+            currentParams={currentParams}
+            basePath="/admin"
+          />
+        </div>
+      )}
       <ReviewQueue queue={queue ?? []} nearDuplicates={Object.fromEntries(nearDuplicates)} />
       <BrokenLinks items={brokenLinks ?? []} />
       <StoryQueue stories={pendingStories ?? []} />

@@ -55,6 +55,7 @@ export const AI_SEARCH_CATEGORIES = [
   "journal",
   "startup",
   "academic",
+  "graduate",
 ] as const;
 const QUERIES_PER_CATEGORY = 4;
 // Batches guarantee results within 24h; treat anything older as stuck rather

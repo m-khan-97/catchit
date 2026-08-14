@@ -24,6 +24,7 @@ export const CATEGORY_STYLES: Record<OpportunityCategory, CategoryStyle> = {
   journal: { dot: "bg-cat-journal-dot", bg: "bg-cat-journal-bg", fg: "text-cat-journal-fg" },
   startup: { dot: "bg-cat-startup-dot", bg: "bg-cat-startup-bg", fg: "text-cat-startup-fg" },
   academic: { dot: "bg-cat-academic-dot", bg: "bg-cat-academic-bg", fg: "text-cat-academic-fg" },
+  graduate: { dot: "bg-cat-graduate-dot", bg: "bg-cat-graduate-bg", fg: "text-cat-graduate-fg" },
   other: { dot: "bg-cat-other-dot", bg: "bg-cat-other-bg", fg: "text-cat-other-fg" },
 };
 

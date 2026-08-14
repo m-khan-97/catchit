@@ -2,7 +2,7 @@
 
 **Catch it before it's gone.**
 
-CatchIt automatically discovers and publishes career-relevant opportunities for students, researchers, and early-career professionals — hackathons, scholarships, internships, free software/cloud credits, tech events, startup pitch competitions & grants, funded PhD studentships & research posts, and conference & journal CFPs — so people stop missing deadlines they'd otherwise never hear about.
+CatchIt automatically discovers and publishes career-relevant opportunities for students, researchers, and early-career professionals — hackathons, scholarships, internships, free software/cloud credits, tech events, startup pitch competitions & grants, funded PhD studentships & research posts, graduate schemes, and conference & journal CFPs — so people stop missing deadlines they'd otherwise never hear about.
 
 **Live at [catchit.aureonsystemsltd.com](https://catchit.aureonsystemsltd.com)** — an [Aureon Systems](https://aureonsystemsltd.com) product.
 
