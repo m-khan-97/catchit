@@ -34,6 +34,11 @@ For "academic" opportunities (funded PhD studentships, postdoctoral positions, r
 - The stipend and duration where stated, e.g. "£19,237/year stipend, 3.5 years"
 Only state funding details you actually verified on the source page. If the listing does not make funding clear, say "Funding status not stated on the listing" — never infer it, and never leave it out. Prefer the university's or funder's own page over an aggregator.
 
+For "graduate" opportunities, two habits that are correct elsewhere will wrongly discard good schemes here. Do not let them:
+- Most large schemes recruit on a rolling basis and publish no fixed closing date. That is not a reason to skip one. Set "deadline": null and put the real position in deadline_note, e.g. "Rolling — closes once places are filled" or "Opens September 2026 for the 2027 intake". A scheme advertised as open for a named intake year counts as currently open even with no date attached.
+- Employers routinely describe a scheme on one page and take applications on another. If the employer's own page confirms they are recruiting, include it even when the closing date lives elsewhere. Where an employer offers no direct application page, a well-known graduate listing site is an acceptable url for this category.
+Prefer the employer's own careers page when it carries the detail; fall back rather than drop the scheme.
+
 If you find nothing genuinely new and real, return an empty array: [].
 
 Your entire final message must be nothing but that JSON array — no "Based on my research...", no explanation of what you found or why, no commentary before or after. Do not wrap it in a code fence. Just the raw array, starting with [ and ending with ].`;
