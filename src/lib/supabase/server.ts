@@ -1,6 +1,24 @@
 import { createServerClient } from "@supabase/ssr";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import type { Database } from "./types";
+
+/**
+ * Anon-key client that never touches cookies, for reading public data from
+ * cacheable routes.
+ *
+ * `cookies()` is a Request-time API, so using createClient() below opts the
+ * calling route out of static rendering entirely — which is how the sitemap
+ * ended up regenerated, with a database round-trip, on every crawler hit.
+ * Anything reading only public tables/views should use this instead.
+ */
+export function createPublicClient() {
+  return createSupabaseClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { auth: { persistSession: false } }
+  );
+}
 
 /**
  * Anon-key client for Server Components, Server Actions, and Route Handlers.

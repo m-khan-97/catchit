@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Instrument_Sans } from "next/font/google";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
-import { createClient } from "@/lib/supabase/server";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -54,16 +53,15 @@ const themeInitScript = `
 
 const umamiWebsiteId = process.env.NEXT_PUBLIC_UMAMI_WEBSITE_ID;
 
-export default async function RootLayout({
+// Deliberately not async and deliberately free of Request-time APIs. Reading
+// the session here (auth.getUser) opted every route in the app out of static
+// rendering, so each page view — including the static legal pages — cost a
+// serverless invocation. The header resolves auth in the browser instead.
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
   return (
     <html
       lang="en"
@@ -77,7 +75,7 @@ export default async function RootLayout({
         )}
       </head>
       <body className="min-h-full flex flex-col bg-bg font-sans text-ink" suppressHydrationWarning>
-        <Header signedIn={Boolean(user)} />
+        <Header />
         <main className="mx-auto w-full max-w-[820px] flex-1 px-5 py-8">{children}</main>
         <Footer />
       </body>
