@@ -15,16 +15,35 @@ function first(value: string | string[] | undefined): string {
   return Array.isArray(value) ? (value[0] ?? "") : (value ?? "");
 }
 
+/**
+ * Collapse anything not in the allowed set to "all".
+ *
+ * This is load-bearing, not defensive tidiness. Unrecognised values used to
+ * be echoed straight back into every link on the page, and `&reg` is a legacy
+ * HTML character reference that some crawlers resolve to ® even without a
+ * semicolon — so `&region=UK` arrived as `®ion=UK`, stopped acting as a
+ * separator, and was absorbed into the previous parameter's value. Echoing
+ * that back grew the string by one `®ion=…` per hop, giving the site an
+ * unbounded set of unique URLs for a crawler to walk forever.
+ */
+function pick(value: string, allowed: readonly string[]): string {
+  return allowed.includes(value) ? value : "all";
+}
+
+// Long enough for real searches, short enough that a crawler can't mint
+// endless distinct URLs out of it.
+const MAX_QUERY_LENGTH = 80;
+
 export default async function Home({
   searchParams,
 }: {
   searchParams: Promise<SearchParams>;
 }) {
   const sp = await searchParams;
-  const category = first(sp.category) || "all";
-  const region = first(sp.region) || "all";
-  const audience = first(sp.audience) || "all";
-  const q = first(sp.q);
+  const category = pick(first(sp.category), CATEGORIES);
+  const region = pick(first(sp.region), REGIONS);
+  const audience = pick(first(sp.audience), AUDIENCE_TAGS);
+  const q = first(sp.q).slice(0, MAX_QUERY_LENGTH);
   const urgent = first(sp.urgent) === "1";
 
   const [feed, engagementCounts] = await Promise.all([

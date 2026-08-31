@@ -1,12 +1,23 @@
 import { createClient } from "@/lib/supabase/server";
 import { sanitizeSearchTerm } from "@/lib/opportunities/search";
-import { CATEGORIES, type OpportunityCategory, type PublicOpportunity } from "./types";
+import {
+  CATEGORIES,
+  REGIONS,
+  AUDIENCE_TAGS,
+  type OpportunityCategory,
+  type PublicOpportunity,
+} from "./types";
 
 // Derived from the shared CATEGORIES constant rather than hand-duplicated —
 // a previous hardcoded copy of this list silently ignored ?category=
 // filters for any category added afterward, since the .eq() below only
 // runs when the value passes this check.
 const CATEGORY_VALUES = new Set<string>(CATEGORIES);
+// Region and audience were previously passed through unchecked, so any
+// string in the query reached the database. /api/opportunities forwards
+// raw query parameters straight here, so this is the only gate.
+const REGION_VALUES = new Set<string>(REGIONS);
+const AUDIENCE_VALUES = new Set<string>(AUDIENCE_TAGS);
 
 export interface FeedFilters {
   category?: string;
@@ -34,10 +45,10 @@ export async function getFeed(filters: FeedFilters): Promise<PublicOpportunity[]
   if (filters.category && filters.category !== "all" && CATEGORY_VALUES.has(filters.category)) {
     query = query.eq("category", filters.category as OpportunityCategory);
   }
-  if (filters.region && filters.region !== "all") {
+  if (filters.region && filters.region !== "all" && REGION_VALUES.has(filters.region)) {
     query = query.contains("region_tags", [filters.region]);
   }
-  if (filters.audience && filters.audience !== "all") {
+  if (filters.audience && filters.audience !== "all" && AUDIENCE_VALUES.has(filters.audience)) {
     query = query.contains("audience_tags", [filters.audience]);
   }
   if (filters.q) {

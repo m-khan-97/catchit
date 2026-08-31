@@ -46,6 +46,10 @@ export function FilterChips({
           <Link
             key={opt.value}
             href={href}
+            // Every chip is a distinct filter permutation, so leaving prefetch
+            // on meant one page view fanning out into a request per chip —
+            // multiplying any crawler's footprint by the size of this row.
+            prefetch={false}
             className={
               isActive
                 ? "inline-flex items-center gap-1.5 rounded-full border border-transparent bg-accent px-3.5 py-1.5 text-[13px] font-semibold text-accent-ink"
