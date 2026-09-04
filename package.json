@@ -20,7 +20,7 @@
     "server-only": "^0.0.1",
     "string-similarity": "^4.0.4",
     "web-push": "^3.6.7",
-    "zod": "^4.4.3"
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
